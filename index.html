@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>小小知識王｜6 題選擇題</title>
+  <!-- SheetJS：用來輸出 Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{ --w: min(920px, 94vw); }
+    html, body { height: 100%; }
+    body{
+      margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
+      color:#e5e7eb;
+      background: #0f172a url('assets/bg.gif') center/cover no-repeat fixed; /* 背景動圖：把你的 bg.gif 放到 assets/ */
+    }
+    /* 背景遮罩，讓文字更清楚 */
+    body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
+
+    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
+    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
+    p.sub{ margin:6px 0 0; color:#cbd5e1; }
+
+    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
+
+    .card{ background:#0b1220cc; border:1px solid #1f2937; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+    .meta{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#cbd5e1; font-size:14px; }
+    .pill{ background:#111827cc; padding:6px 12px; border-radius:999px; border:1px solid #334155; }
+
+    .q{ font-weight:800; font-size:20px; margin:6px 0 12px; }
+    .choices{ display:grid; grid-template-columns:1fr; gap:12px; }
+    .choices button{ text-align:left; border:1px solid #334155; background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:12px; cursor:pointer; transition: transform .02s ease-in, border-color .15s ease; }
+    .choices button:hover{ transform: translateY(-1px); border-color:#60a5fa; }
+    .choices button.selected{ border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) inset; }
+
+    .controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; }
+    .btn{ background:#2563eb; color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
+    .btn.ghost{ background:transparent; border:1px solid #334155; color:#e5e7eb; }
+    .btn.warn{ background:#991b1b; }
+
+    .result{ padding:16px; border-radius:12px; background:#052e16; border:1px solid #14532d; color:#bbf7d0; }
+    .small{ font-size:12px; color:#94a3b8; }
+
+    form label{ display:block; font-weight:700; margin: 10px 0 6px; }
+    input[type="text"], input[type="email"]{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+
+    footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>小小知識王｜6 題選擇題</h1>
+    <p class="sub">作法：四個選項 × 6 題、背景動圖、交卷後填玩家資料，並可匯出 Excel。直接放在 GitHub Pages 即可使用。</p>
+  </header>
+
+  <main>
+    <div class="meta card" id="hud">
+      <span id="progress" class="pill">第 1/6 題</span>
+      <span id="score" class="pill">得分：0</span>
+      <span id="timer" class="pill">00:00</span>
+    </div>
+
+    <div id="quiz"></div>
+
+    <div class="controls">
+      <button id="prev" class="btn ghost" disabled>上一題</button>
+      <div style="flex:1"></div>
+      <button id="next" class="btn">下一題</button>
+      <button id="finish" class="btn" style="display:none">交卷</button>
+    </div>
+
+    <div id="summary" style="margin-top:16px"></div>
+  </main>
+
+  <footer>
+    <p class="small">自訂：在 <code>const QUESTIONS = [...];</code> 改題庫；把你的背景動圖放在 <code>assets/bg.gif</code>，或改成 <code>jpg/mp4</code> 皆可。</p>
+  </footer>
+
+<script>
+/********************
+ * 1) 題庫（四選項 × 6 題）
+ ********************/
+const QUESTIONS = [
+  { q:'GitHub Pages 主要用途是？', options:['部署靜態網站','當資料庫用','寄發電子報','執行雲端函式'], answer:0, explain:'Pages 會把 HTML/CSS/JS 公開成網站。' },
+  { q:'下列何者不是 Git 基本動作？', options:['commit','push','pull','compile'], answer:3, explain:'compile 是編譯，Git 動作不是它。' },
+  { q:'建立新分支常用指令？', options:['git branch 新分支名','git make branch','git split','git new'], answer:0, explain:'git branch feature-x。' },
+  { q:'README.md 通常使用哪種語法？', options:['Markdown','LaTeX','CSV','SQL'], answer:0, explain:'README 預設採 Markdown。' },
+  { q:'想把程式變更上傳到遠端，需使用？', options:['git push','git add remote','git upload','git send'], answer:0, explain:'本地 commit 後用 git push。' },
+  { q:'Issues 適合用來？', options:['追蹤問題/需求','佈署靜態網站','儲存二進位檔','執行排程器'], answer:0, explain:'Issues=協作追蹤問題/任務。' },
+];
+
+/********************
+ * 2) 狀態與設定
+ ********************/
+let state = {
+  idx: 0,
+  score: 0,
+  selected: {}, // 單選：number
+  startAt: Date.now(),
+  finished: false,
+};
+const POINTS_PER_Q = 1; // 每題配分
+
+/********************
+ * 3) 工具函式
+ ********************/
+const $ = (s)=>document.querySelector(s);
+const quizEl = $('#quiz');
+const progressEl = $('#progress');
+const scoreEl = $('#score');
+const timerEl = $('#timer');
+const prevBtn = $('#prev');
+const nextBtn = $('#next');
+const finishBtn = $('#finish');
+const summaryEl = $('#summary');
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function render(){
+  const total = QUESTIONS.length;
+  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
+  scoreEl.textContent = `得分：${state.score}`;
+  prevBtn.disabled = state.idx === 0;
+  nextBtn.style.display = state.idx < total-1 ? 'inline-block' : 'none';
+  finishBtn.style.display = state.idx === total-1 ? 'inline-block' : 'none';
+
+  const q = QUESTIONS[state.idx];
+  quizEl.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const qEl = document.createElement('div');
+  qEl.className = 'q';
+  qEl.textContent = q.q;
+  card.appendChild(qEl);
+
+  const choices = document.createElement('div');
+  choices.className = 'choices';
+
+  q.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = `${'ABCD'[i]}. ${opt}`;
+
+    const sel = state.selected[state.idx];
+    if(sel === i) btn.classList.add('selected');
+
+    btn.addEventListener('click', ()=>{
+      state.selected[state.idx] = i;
+      render();
+    });
+
+    choices.appendChild(btn);
+  });
+
+  card.appendChild(choices);
+  quizEl.appendChild(card);
+}
+
+function grade(){
+  let score = 0;
+  const details = [];
+  QUESTIONS.forEach((q, i)=>{
+    const sel = state.selected[i];
+    const correct = sel === q.answer;
+    if(correct) score += POINTS_PER_Q;
+    details.push({
+      q: q.q,
+      selected: typeof sel === 'number' ? `${'ABCD'[sel]}. ${q.options[sel]}` : '(未作答)',
+      answer: `${'ABCD'[q.answer]}. ${q.options[q.answer]}`,
+      correct,
+      explain: q.explain || ''
+    });
+  });
+  state.score = score;
+  state.finished = true;
+
+  const maxScore = QUESTIONS.length * POINTS_PER_Q;
+  const percent = Math.round(score / maxScore * 100);
+  const used = Math.round((Date.now()-state.startAt)/1000);
+
+  // 成績摘要 + 玩家表單
+  summaryEl.innerHTML = `
+    <div class="result">
+      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）&nbsp;&nbsp;|&nbsp;&nbsp;<strong>花費時間</strong>：${formatTime(used)}
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3 style="margin:0 0 8px">玩家資訊</h3>
+      <form id="playerForm" onsubmit="return false;">
+        <div class="grid">
+          <div>
+            <label>姓名 *</label>
+            <input type="text" id="name" required placeholder="王小明" />
+          </div>
+          <div>
+            <label>公司</label>
+            <input type="text" id="company" placeholder="範例股份有限公司" />
+          </div>
+          <div>
+            <label>電話 *</label>
+            <input type="text" id="phone" required placeholder="09xx-xxx-xxx" />
+          </div>
+          <div>
+            <label>Email *</label>
+            <input type="email" id="email" required placeholder="user@example.com" />
+          </div>
+        </div>
+        <div class="controls" style="margin-top:16px">
+          <button id="savePlayer" class="btn">儲存這位玩家</button>
+          <div style="flex:1"></div>
+          <button id="downloadExcel" class="btn">下載 Excel</button>
+          <button id="downloadCSV" class="btn ghost">下載 CSV</button>
+          <button id="clearAll" class="btn warn">清空本機資料</button>
+        </div>
+        <p class="small">提示：資料僅儲存在這台裝置的瀏覽器（localStorage）。如需雲端蒐集，改用 Google Sheet / 後端 API。</p>
+      </form>
+    </div>
+
+    <div style="margin-top:10px">
+      ${details.map((d,idx)=>`
+        <div class="card" style="background:#0a1a2fcc">
+          <div class="q">第 ${idx+1} 題：${d.q}</div>
+          <div>${d.correct ? '✅ 正確' : '❌ 錯誤'}</div>
+          <div style="margin-top:6px">你的答案：${d.selected}</div>
+          <div>正確答案：${d.answer}</div>
+          ${d.explain ? `<div style="margin-top:6px; color:#a7f3d0">解析：${d.explain}</div>`:''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // 綁定表單按鈕行為
+  bindFormButtons({score, maxScore, percent, used, details});
+  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+}
+
+function bindFormButtons(payload){
+  const f = {
+    name: $('#name'), company: $('#company'), phone: $('#phone'), email: $('#email')
+  };
+  const saveBtn = $('#savePlayer');
+  const excelBtn = $('#downloadExcel');
+  const csvBtn = $('#downloadCSV');
+  const clearBtn = $('#clearAll');
+
+  saveBtn.addEventListener('click', ()=>{
+    // 驗證
+    if(!f.name.value.trim()){ alert('請填寫姓名'); return; }
+    if(!/^[0-9+\-()\s]{6,}$/.test(f.phone.value.trim())){ alert('電話格式不太對'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())){ alert('Email 格式不太對'); return; }
+
+    const record = {
+      timestamp: new Date().toISOString(),
+      姓名: f.name.value.trim(),
+      公司: f.company.value.trim(),
+      電話: f.phone.value.trim(),
+      Email: f.email.value.trim(),
+      得分: payload.score,
+      總分: payload.maxScore,
+      百分比: payload.percent + '%',
+      花費秒數: payload.used,
+      // 也可存每題作答：
+      作答: payload.details.map((d,i)=>`Q${i+1}:${d.correct?'O':'X'}`).join(' ')
+    };
+
+    const key = 'quiz_records_v1';
+    const all = JSON.parse(localStorage.getItem(key) || '[]');
+    all.push(record);
+    localStorage.setItem(key, JSON.stringify(all));
+    alert('已儲存到本機（localStorage）。可繼續下載 Excel/CSV 或換下一位玩家作答。');
+  });
+
+  excelBtn.addEventListener('click', ()=>{
+    const key = 'quiz_records_v1';
+    const all = JSON.parse(localStorage.getItem(key) || '[]');
+    if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
+    const ws = XLSX.utils.json_to_sheet(all);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'records');
+    XLSX.writeFile(wb, 'quiz_records.xlsx');
+  });
+
+  csvBtn.addEventListener('click', ()=>{
+    const key = 'quiz_records_v1';
+    const all = JSON.parse(localStorage.getItem(key) || '[]');
+    if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
+    const header = Object.keys(all[0]);
+    const rows = [header.join(',')].concat(all.map(obj=> header.map(h=>`"${String(obj[h]??'').replaceAll('"','""')}"`).join(',')));
+    const blob = new Blob(["\ufeff" + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'quiz_records.csv';
+    a.click();
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    if(confirm('確定要清空這台裝置上的所有玩家資料？')){
+      localStorage.removeItem('quiz_records_v1');
+      alert('已清空。');
+    }
+  });
+}
+
+/********************
+ * 4) 事件與初始化
+ ********************/
+prevBtn.addEventListener('click', ()=>{ if(state.idx>0){ state.idx--; render(); }});
+nextBtn.addEventListener('click', ()=>{ if(state.idx<QUESTIONS.length-1){ state.idx++; render(); }});
+finishBtn.addEventListener('click', grade);
+
+// 計時器
+setInterval(()=>{
+  if(state.finished) return;
+  const sec = (Date.now()-state.startAt)/1000;
+  timerEl.textContent = formatTime(sec);
+}, 1000);
+
+// 初次繪製
+render();
+</script>
+</body>
+</html>
