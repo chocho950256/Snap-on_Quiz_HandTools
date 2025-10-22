@@ -15,7 +15,7 @@
       background: #0f172a url('assets/BackGround.png') center/cover no-repeat fixed; /* 背景圖片：請放在 assets/BackGround.png */
     }
     /* 左上角貼圖 GIF */
-    .corner-gif{ position:fixed; top:12px; left:12px; width:96px; z-index:10; pointer-events:none; border-radius:12px; }
+    .corner-gif{ position:fixed; top:12px; right:12px; width:116px; z-index:10; pointer-events:none; border-radius:12px; }
 
     /* 背景遮罩，讓文字更清楚 */
     body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
@@ -58,7 +58,7 @@
 
   <header>
     <h1>Snap-on 小小知識王</h1>
-    <p class="sub">測試看看你對Snap-on工具的了解程度!</p>
+    <p class="sub">測試看看你對Snap-on工具的瞭解程度!</p>
   </header>
 
   <main>
@@ -206,8 +206,8 @@ function grade(){
             <input type="text" id="name" required placeholder="王小明" />
           </div>
           <div>
-            <label>公司</label>
-            <input type="text" id="company" placeholder="範例股份有限公司" />
+            <label>公司/學校<\/label>
+            <input type="text" id="company" placeholder="公司/學校" />
           </div>
           <div>
             <label>電話 *</label>
@@ -265,7 +265,7 @@ function bindFormButtons(payload){
     const record = {
       timestamp: new Date().toISOString(),
       姓名: f.name.value.trim(),
-      公司/學校: f.company.value.trim(),
+      公司: f.company.value.trim(),
       電話: f.phone.value.trim(),
       Email: f.email.value.trim(),
       得分: payload.score,
