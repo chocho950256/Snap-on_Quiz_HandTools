@@ -12,7 +12,7 @@
     body{
       margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      background: #0f172a url('assets/bg.gif') center/cover no-repeat fixed; /* 背景動圖：把你的 bg.gif 放到 assets/ */
+      background: #0f172a url('assets/BackGround.png') center/cover no-repeat fixed; /* 背景動圖：把你的 bg.gif 放到 assets/ */
     }
     /* 背景遮罩，讓文字更清楚 */
     body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
@@ -47,9 +47,11 @@
     @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
 
     footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
-  </style>
+    .corner-gif{ position:fixed; top:12px; left:12px; width:96px; z-index:10; pointer-events:none; border-radius:12px; }
+</style>
 </head>
 <body>
+  <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
   <header>
     <h1>小小知識王｜6 題選擇題</h1>
     <p class="sub">作法：四個選項 × 6 題、背景動圖、交卷後填玩家資料，並可匯出 Excel。直接放在 GitHub Pages 即可使用。</p>
@@ -75,7 +77,14 @@
   </main>
 
   <footer>
-    <p class="small">自訂：在 <code>const QUESTIONS = [...];</code> 改題庫；把你的背景動圖放在 <code>assets/bg.gif</code>，或改成 <code>jpg/mp4</code> 皆可。</p>
+    <p class="small">自訂：在 <code>const QUESTIONS = [
+  { q:'Snap-on 常見的「Level 5 ATC 系統」主要功能是什麼?', options:['自動化工具控管與追蹤','工具自動校正精度','自動平衡輪胎','自動辨識車輛故障碼'], answer:0, explain:'Level 5 ATC（Asset Tracking & Control）可對工具資產進行授權、追蹤與紀錄，提高管理效率與防遺失。' },
+  { q:'Snap-on 的套筒內部常見的「Flank Drive」設計主要作用是?', options:['避免螺絲滑牙','增加亮面裝飾效果','減輕套筒重量','防止套筒生鏽'], answer:0, explain:'Flank Drive 以接觸螺帽側壁而非尖角，降低滑牙風險、提升扭力傳遞。' },
+  { q:'Snap-on 的工具為什麼大多採用鍍鉻處理?', options:['防鏽與易清潔','讓重量更輕','提升導電性','減少生產成本'], answer:0, explain:'鉻鍍層可抗腐蝕、表面平滑易於清潔，延長工具壽命與專業外觀。' },
+  { q:'Snap-on 的衝擊套筒與普通套筒最大差異是?', options:['採用耐衝擊鋼材與厚壁設計','全部採亮面塗裝','僅能單次使用','不可用於氣動工具'], answer:0, explain:'衝擊套筒使用衝擊級鋼材、壁厚較厚以吸收衝擊力，適合搭配氣動/電動衝擊工具。' },
+  { q:'Snap-on 的棘輪扳手特色之一是?', options:['齒數多、角度細小，旋轉更精準','僅能單向使用','全部無鍍層','需經過校正才能使用'], answer:0, explain:'高齒數帶來較小的最小擺角（swing arc），在狹小空間更好操作。' },
+  { q:'Snap-on 旗下的 Bahco 品牌最廣為人知的代表產品是什麼?', options:['活動扳手','銼刀','鋸片','鉗子'], answer:0, explain:'Bahco 以活動扳手（Adjustable Wrench）最廣為人知。' },
+];</code> 改題庫；把你的背景動圖放在 <code>assets/BackGround.png</code>，或改成 <code>jpg/mp4</code> 皆可。</p>
   </footer>
 
 <script>
