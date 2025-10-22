@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Snap-on 小小知識王｜6 題選擇題</title>
+  <title>Snap-on 小小知識王</title>
   <!-- SheetJS：用來輸出 Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -58,7 +58,7 @@
 
   <header>
     <h1>Snap-on 小小知識王｜6 題選擇題</h1>
-    <p class="sub">四個選項 × 6 題、背景圖片、交卷後填玩家資料，並可匯出 Excel。把本檔放在 GitHub Pages 即可使用。</p>
+    <p class="sub">測試看看你對Snap-on工具的了解程度!</p>
   </header>
 
   <main>
@@ -265,7 +265,7 @@ function bindFormButtons(payload){
     const record = {
       timestamp: new Date().toISOString(),
       姓名: f.name.value.trim(),
-      公司: f.company.value.trim(),
+      公司/學校: f.company.value.trim(),
       電話: f.phone.value.trim(),
       Email: f.email.value.trim(),
       得分: payload.score,
