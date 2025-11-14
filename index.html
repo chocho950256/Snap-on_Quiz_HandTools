@@ -1,374 +1,369 @@
-diff --git a/index.html b/index.html
-index bd798caaf7121f7e4894971768f653abe112af4d..7eac16448bfc619bc03947bedf719d660da8901b 100644
---- a/index.html
-+++ b/index.html
-@@ -1,213 +1,272 @@
- <!doctype html>
- <html lang="zh-Hant">
- <head>
-   <meta charset="utf-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-   <title>Snap-on 小小知識王</title>
-   <!-- SheetJS：用來輸出 Excel -->
-   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-   <style>
-     :root{ --w: min(920px, 94vw); }
-     html, body { height: 100%; }
-     body{
-       margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
-       color:#e5e7eb;
--      background: #0f172a url('assets/BackGround.png') center/cover no-repeat fixed; /* 背景圖片：請放在 assets/BackGround.png */
-+      background-color:#0f172a;
-+      background-position:center;
-+      background-size:cover;
-+      background-repeat:no-repeat;
-+      background-attachment:fixed;
-     }
-+    body.bg-1{ background-image:url('assets/BackGround 1.png'); }
-+    body.bg-2{ background-image:url('assets/BackGround 2.png'); }
-     /* 左上角貼圖 GIF */
-     .corner-gif{ position:fixed; top:12px; right:12px; width:116px; z-index:10; pointer-events:none; border-radius:12px; }
- 
-     /* 背景遮罩，讓文字更清楚 */
-     body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
- 
--    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
-+    header{ margin:0; }
-     h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
-     p.sub{ margin:6px 0 0; color:#cbd5e1; }
- 
--    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
-+    main{ max-width:var(--w); margin: 40px auto 60px; padding:16px; }
-+
-+    .layout{ display:flex; gap:20px; align-items:flex-start; justify-content:flex-end; }
-+    .left-panel{ flex:0 0 40%; max-width:40%; }
-+    .right-panel{ flex:1 1 460px; max-width:600px; display:flex; flex-direction:column; gap:18px; }
-+    .right-panel header{ padding:0; }
- 
-     .card{ background:#0b1220cc; border:1px solid #1f2937; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 10px 30px rgba(0,0,0,.25); }
-     .meta{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#cbd5e1; font-size:14px; }
-     .pill{ background:#111827cc; padding:6px 12px; border-radius:999px; border:1px solid #334155; }
- 
-+    .progress-wrap{ margin-top:10px; background:#1e293b; border-radius:999px; overflow:hidden; border:1px solid #334155; height:14px; }
-+    .progress-bar{ height:100%; width:0; background:linear-gradient(90deg,#22d3ee,#2563eb); transition:width .3s ease; }
-+
-     .q{ font-weight:800; font-size:20px; margin:6px 0 12px; }
-     .choices{ display:grid; grid-template-columns:1fr; gap:12px; }
-     .choices button{ text-align:left; border:1px solid #334155; background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:12px; cursor:pointer; transition: transform .02s ease-in, border-color .15s ease; }
-     .choices button:hover{ transform: translateY(-1px); border-color:#60a5fa; }
-     .choices button.selected{ border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) inset; }
-+    .choices button.correct{ border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25) inset; }
-+    .choices button.wrong{ border-color:#f87171; box-shadow:0 0 0 3px rgba(248,113,113,.25) inset; }
-+    .choices button:disabled{ cursor:default; opacity:.85; transform:none; }
- 
-     .controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; }
-     .btn{ background:#2563eb; color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
-     .btn.ghost{ background:transparent; border:1px solid #334155; color:#e5e7eb; }
-     .btn.warn{ background:#991b1b; }
- 
-     .result{ padding:16px; border-radius:12px; background:#052e16; border:1px solid #14532d; color:#bbf7d0; }
-     .small{ font-size:12px; color:#94a3b8; }
- 
-     form label{ display:block; font-weight:700; margin: 10px 0 6px; }
-     input[type="text"], input[type="email"]{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
-     .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-     @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
- 
-     footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
-+
-+    @media (max-width:960px){
-+      .layout{ flex-direction:column; align-items:stretch; }
-+      .left-panel{ display:none; }
-+      .right-panel{ max-width:none; }
-+    }
-   </style>
- </head>
--<body>
-+<body class="bg-1">
-   <!-- 左上角 GIF：請將檔案放在 assets/Snap Spark Sticker by Snap-on Tools.gif -->
-   <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
- 
--  <header>
--    <h1>Snap-on 小小知識王</h1>
--    <p class="sub">測試看看你對Snap-on工具的瞭解程度!</p>
--  </header>
--
-   <main>
--    <div class="meta card" id="hud">
--      <span id="progress" class="pill">第 1/6 題</span>
--      <span id="score" class="pill">得分：0</span>
--      <span id="timer" class="pill">00:00</span>
--    </div>
--
--    <div id="quiz"></div>
--
--    <div class="controls">
--      <button id="prev" class="btn ghost" disabled>上一題</button>
--      <div style="flex:1"></div>
--      <button id="next" class="btn">下一題</button>
--      <button id="finish" class="btn" style="display:none">交卷</button>
-+    <div class="layout">
-+      <section class="left-panel" aria-hidden="true"></section>
-+      <section class="right-panel">
-+        <header>
-+          <h1>Snap-on 小小知識王</h1>
-+          <p class="sub">測試看看你對Snap-on工具的瞭解程度!</p>
-+        </header>
-+        <div class="meta card" id="hud">
-+          <span id="progress" class="pill">第 1/2 題</span>
-+          <span id="score" class="pill">得分：0</span>
-+          <span id="timer" class="pill">00:00</span>
-+        </div>
-+        <div class="progress-wrap" aria-hidden="true">
-+          <div id="progressFill" class="progress-bar"></div>
-+        </div>
-+        <div id="quiz"></div>
-+        <div class="controls">
-+          <button id="prev" class="btn ghost" disabled>上一題</button>
-+          <div style="flex:1"></div>
-+          <button id="next" class="btn">下一題</button>
-+          <button id="finish" class="btn" style="display:none">交卷</button>
-+          <button id="restart" class="btn ghost" style="display:none">重新開始</button>
-+        </div>
-+      </section>
-     </div>
- 
-     <div id="summary" style="margin-top:16px"></div>
-   </main>
- 
-   <footer>
--    <p class="small">自訂：在 <code>const QUESTIONS = [...]</code> 改題庫；背景圖路徑 <code>assets/BackGround.png</code>；左上角 GIF 路徑 <code>assets/Snap Spark Sticker by Snap-on Tools.gif</code>。</p>
-+    <p class="small">自訂：在 <code>const QUESTIONS = [...]</code> 改題庫；背景圖路徑 <code>assets/BackGround 1.png</code>、<code>assets/BackGround 2.png</code>；左上角 GIF 路徑 <code>assets/Snap Spark Sticker by Snap-on Tools.gif</code>。</p>
-   </footer>
- 
- <script>
- /********************
-- * 1) 題庫（四選項 × 6 題）
-+ * 1) 題庫（四選項 × 2 題）
-  ********************/
- const QUESTIONS = [
-   { q:'Snap-on 常見的「Level 5 ATC 系統」主要功能是什麼?', options:['自動化工具控管與追蹤','工具自動校正精度','自動平衡輪胎','自動辨識車輛故障碼'], answer:0, explain:'Level 5 ATC（Asset Tracking & Control）可對工具資產進行授權、追蹤與紀錄，提高管理效率與防遺失。' },
-   { q:'Snap-on 的套筒內部常見的「Flank Drive」設計主要作用是?', options:['避免螺絲滑牙','增加亮面裝飾效果','減輕套筒重量','防止套筒生鏽'], answer:0, explain:'Flank Drive 以接觸螺帽側壁而非尖角，降低滑牙風險、提升扭力傳遞。' },
--  { q:'Snap-on 的工具為什麼大多採用鍍鉻處理?', options:['防鏽與易清潔','讓重量更輕','提升導電性','減少生產成本'], answer:0, explain:'鉻鍍層可抗腐蝕、表面平滑易於清潔，延長工具壽命與專業外觀。' },
--  { q:'Snap-on 的衝擊套筒與普通套筒最大差異是?', options:['採用耐衝擊鋼材與厚壁設計','全部採亮面塗裝','僅能單次使用','不可用於氣動工具'], answer:0, explain:'衝擊套筒使用衝擊級鋼材、壁厚較厚以吸收衝擊力，適合搭配氣動/電動衝擊工具。' },
--  { q:'Snap-on 的棘輪扳手特色之一是?', options:['齒數多、角度細小，旋轉更精準','僅能單向使用','全部無鍍層','需經過校正才能使用'], answer:0, explain:'高齒數帶來較小的最小擺角（swing arc），在狹小空間更好操作。' },
--  { q:'Snap-on 旗下的 Bahco 品牌最廣為人知的代表產品是什麼?', options:['活動扳手','銼刀','鋸片','鉗子'], answer:0, explain:'Bahco 以活動扳手（Adjustable Wrench）最廣為人知。' },
- ];
- 
- /********************
-  * 2) 狀態與設定
-  ********************/
- let state = {
-   idx: 0,
-   score: 0,
-   selected: {}, // 單選：number
-   startAt: Date.now(),
-   finished: false,
- };
- const POINTS_PER_Q = 1; // 每題配分
- 
- /********************
-  * 3) 工具函式與元素
-  ********************/
- const $ = (s)=>document.querySelector(s);
- const quizEl = $('#quiz');
- const progressEl = $('#progress');
- const scoreEl = $('#score');
- const timerEl = $('#timer');
- const prevBtn = $('#prev');
- const nextBtn = $('#next');
- const finishBtn = $('#finish');
-+const restartBtn = $('#restart');
-+const progressFill = $('#progressFill');
- const summaryEl = $('#summary');
-+const bodyEl = document.body;
-+const backgroundClasses = ['bg-1', 'bg-2'];
- 
- function formatTime(sec){
-   const m = Math.floor(sec/60).toString().padStart(2,'0');
-   const s = Math.floor(sec%60).toString().padStart(2,'0');
-   return `${m}:${s}`;
- }
- 
-+function updateBackground(){
-+  bodyEl.classList.remove(...backgroundClasses);
-+  if(!backgroundClasses.length) return;
-+  const classIdx = Math.min(state.idx, backgroundClasses.length-1);
-+  bodyEl.classList.add(backgroundClasses[classIdx]);
-+}
-+
- function render(){
-   const total = QUESTIONS.length;
-   progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
-   scoreEl.textContent = `得分：${state.score}`;
--  prevBtn.disabled = state.idx === 0;
--  nextBtn.style.display = state.idx < total-1 ? 'inline-block' : 'none';
--  finishBtn.style.display = state.idx === total-1 ? 'inline-block' : 'none';
-+  const atFirst = state.idx === 0;
-+  const atLast = state.idx === total-1;
-+  prevBtn.disabled = atFirst;
-+  const answeredCount = Object.keys(state.selected).length;
-+  const progressPercent = total ? Math.round(Math.min(answeredCount, total) / total * 100) : 0;
-+  progressFill.style.width = `${progressPercent}%`;
-+  updateBackground();
-+
-+  if(state.finished){
-+    nextBtn.style.display = 'inline-block';
-+    nextBtn.disabled = atLast;
-+    finishBtn.style.display = 'none';
-+    restartBtn.style.display = 'inline-block';
-+  }else{
-+    nextBtn.style.display = atLast ? 'none' : 'inline-block';
-+    nextBtn.disabled = false;
-+    finishBtn.style.display = atLast ? 'inline-block' : 'none';
-+    restartBtn.style.display = 'none';
-+  }
- 
-   const q = QUESTIONS[state.idx];
-   quizEl.innerHTML = '';
- 
-   const card = document.createElement('div');
-   card.className = 'card';
- 
-   const qEl = document.createElement('div');
-   qEl.className = 'q';
-   qEl.textContent = q.q;
-   card.appendChild(qEl);
- 
-   const choices = document.createElement('div');
-   choices.className = 'choices';
- 
-   q.options.forEach((opt, i)=>{
-     const btn = document.createElement('button');
-     btn.textContent = `${'ABCD'[i]}. ${opt}`;
- 
-     const sel = state.selected[state.idx];
-     if(sel === i) btn.classList.add('selected');
- 
--    btn.addEventListener('click', ()=>{
--      state.selected[state.idx] = i;
--      render();
--    });
-+    if(state.finished){
-+      btn.disabled = true;
-+      if(i === q.answer) btn.classList.add('correct');
-+      if(typeof sel === 'number' && sel === i && sel !== q.answer) btn.classList.add('wrong');
-+    }else{
-+      btn.addEventListener('click', ()=>{
-+        state.selected[state.idx] = i;
-+        render();
-+      });
-+    }
- 
-     choices.appendChild(btn);
-   });
- 
-   card.appendChild(choices);
-   quizEl.appendChild(card);
- }
- 
- function grade(){
-   let score = 0;
-   const details = [];
-   QUESTIONS.forEach((q, i)=>{
-     const sel = state.selected[i];
-     const correct = sel === q.answer;
-     if(correct) score += POINTS_PER_Q;
-     details.push({
-       q: q.q,
-       selected: typeof sel === 'number' ? `${'ABCD'[sel]}. ${q.options[sel]}` : '(未作答)',
-       answer: `${'ABCD'[q.answer]}. ${q.options[q.answer]}`,
-       correct,
-       explain: q.explain || ''
-     });
-   });
-   state.score = score;
-   state.finished = true;
-+  render();
- 
-   const maxScore = QUESTIONS.length * POINTS_PER_Q;
-   const percent = Math.round(score / maxScore * 100);
-   const used = Math.round((Date.now()-state.startAt)/1000);
- 
-   // 成績摘要 + 玩家表單
-   summaryEl.innerHTML = `
-     <div class="result">
-       <strong>成績</strong>：${score} / ${maxScore}（${percent}%）&nbsp;&nbsp;|&nbsp;&nbsp;<strong>花費時間</strong>：${formatTime(used)}
-     </div>
- 
-     <div class="card" style="margin-top:12px">
-       <h3 style="margin:0 0 8px">玩家資訊</h3>
-       <form id="playerForm" onsubmit="return false;">
-         <div class="grid">
-           <div>
-             <label>姓名 *</label>
-             <input type="text" id="name" required placeholder="王小明" />
-           </div>
-           <div>
-             <label>公司/學校<\/label>
-             <input type="text" id="company" placeholder="公司/學校" />
-           </div>
-           <div>
-             <label>電話 *</label>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Snap-on 小小知識王</title>
+  <!-- SheetJS：用來輸出 Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{ --w: min(920px, 94vw); }
+    html, body { height: 100%; }
+    body{
+      margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
+      color:#e5e7eb;
+      background: #0f172a url('assets/BackGround.png') center/cover no-repeat fixed; /* 背景圖片：請放在 assets/BackGround.png */
+      background-color:#0f172a;
+      background-position:center;
+      background-size:cover;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+    body.bg-1{ background-image:url('assets/BackGround 1.png'); }
+    body.bg-2{ background-image:url('assets/BackGround 2.png'); }
+    /* 左上角貼圖 GIF */
+    .corner-gif{ position:fixed; top:12px; right:12px; width:116px; z-index:10; pointer-events:none; border-radius:12px; }
+
+    /* 背景遮罩，讓文字更清楚 */
+    body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
+
+    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
+    header{ margin:0; }
+    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
+    p.sub{ margin:6px 0 0; color:#cbd5e1; }
+
+    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
+    main{ max-width:var(--w); margin: 40px auto 60px; padding:16px; }
+
+    .layout{ display:flex; gap:20px; align-items:flex-start; justify-content:flex-end; }
+    .left-panel{ flex:0 0 40%; max-width:40%; }
+    .right-panel{ flex:1 1 460px; max-width:600px; display:flex; flex-direction:column; gap:18px; }
+    .right-panel header{ padding:0; }
+
+    .card{ background:#0b1220cc; border:1px solid #1f2937; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+    .meta{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#cbd5e1; font-size:14px; }
+    .pill{ background:#111827cc; padding:6px 12px; border-radius:999px; border:1px solid #334155; }
+
+    .progress-wrap{ margin-top:10px; background:#1e293b; border-radius:999px; overflow:hidden; border:1px solid #334155; height:14px; }
+    .progress-bar{ height:100%; width:0; background:linear-gradient(90deg,#22d3ee,#2563eb); transition:width .3s ease; }
+
+    .q{ font-weight:800; font-size:20px; margin:6px 0 12px; }
+    .choices{ display:grid; grid-template-columns:1fr; gap:12px; }
+    .choices button{ text-align:left; border:1px solid #334155; background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:12px; cursor:pointer; transition: transform .02s ease-in, border-color .15s ease; }
+    .choices button:hover{ transform: translateY(-1px); border-color:#60a5fa; }
+    .choices button.selected{ border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) inset; }
+    .choices button.correct{ border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25) inset; }
+    .choices button.wrong{ border-color:#f87171; box-shadow:0 0 0 3px rgba(248,113,113,.25) inset; }
+    .choices button:disabled{ cursor:default; opacity:.85; transform:none; }
+
+    .controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; }
+    .btn{ background:#2563eb; color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
+    .btn.ghost{ background:transparent; border:1px solid #334155; color:#e5e7eb; }
+    .btn.warn{ background:#991b1b; }
+
+    .result{ padding:16px; border-radius:12px; background:#052e16; border:1px solid #14532d; color:#bbf7d0; }
+    .small{ font-size:12px; color:#94a3b8; }
+
+    form label{ display:block; font-weight:700; margin: 10px 0 6px; }
+    input[type="text"], input[type="email"]{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+
+    footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
+
+    @media (max-width:960px){
+      .layout{ flex-direction:column; align-items:stretch; }
+      .left-panel{ display:none; }
+      .right-panel{ max-width:none; }
+    }
+  </style>
+</head>
+<body>
+<body class="bg-1">
+  <!-- 左上角 GIF：請將檔案放在 assets/Snap Spark Sticker by Snap-on Tools.gif -->
+  <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
+
+  <header>
+    <h1>Snap-on 小小知識王</h1>
+    <p class="sub">測試看看你對Snap-on工具的瞭解程度!</p>
+  </header>
+
+  <main>
+    <div class="meta card" id="hud">
+      <span id="progress" class="pill">第 1/6 題</span>
+      <span id="score" class="pill">得分：0</span>
+      <span id="timer" class="pill">00:00</span>
+    </div>
+
+    <div id="quiz"></div>
+
+    <div class="controls">
+      <button id="prev" class="btn ghost" disabled>上一題</button>
+      <div style="flex:1"></div>
+      <button id="next" class="btn">下一題</button>
+      <button id="finish" class="btn" style="display:none">交卷</button>
+    <div class="layout">
+      <section class="left-panel" aria-hidden="true"></section>
+      <section class="right-panel">
+        <header>
+          <h1>Snap-on 小小知識王</h1>
+          <p class="sub">測試看看你對Snap-on工具的瞭解程度!</p>
+        </header>
+        <div class="meta card" id="hud">
+          <span id="progress" class="pill">第 1/2 題</span>
+          <span id="score" class="pill">得分：0</span>
+          <span id="timer" class="pill">00:00</span>
+        </div>
+        <div class="progress-wrap" aria-hidden="true">
+          <div id="progressFill" class="progress-bar"></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="controls">
+          <button id="prev" class="btn ghost" disabled>上一題</button>
+          <div style="flex:1"></div>
+          <button id="next" class="btn">下一題</button>
+          <button id="finish" class="btn" style="display:none">交卷</button>
+          <button id="restart" class="btn ghost" style="display:none">重新開始</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="summary" style="margin-top:16px"></div>
+  </main>
+
+  <footer>
+    <p class="small">自訂：在 <code>const QUESTIONS = [...]</code> 改題庫；背景圖路徑 <code>assets/BackGround.png</code>；左上角 GIF 路徑 <code>assets/Snap Spark Sticker by Snap-on Tools.gif</code>。</p>
+    <p class="small">自訂：在 <code>const QUESTIONS = [...]</code> 改題庫；背景圖路徑 <code>assets/BackGround 1.png</code>、<code>assets/BackGround 2.png</code>；左上角 GIF 路徑 <code>assets/Snap Spark Sticker by Snap-on Tools.gif</code>。</p>
+  </footer>
+
+<script>
+/********************
+ * 1) 題庫（四選項 × 6 題）
+ * 1) 題庫（四選項 × 2 題）
+ ********************/
+const QUESTIONS = [
+  { q:'Snap-on 常見的「Level 5 ATC 系統」主要功能是什麼?', options:['自動化工具控管與追蹤','工具自動校正精度','自動平衡輪胎','自動辨識車輛故障碼'], answer:0, explain:'Level 5 ATC（Asset Tracking & Control）可對工具資產進行授權、追蹤與紀錄，提高管理效率與防遺失。' },
+  { q:'Snap-on 的套筒內部常見的「Flank Drive」設計主要作用是?', options:['避免螺絲滑牙','增加亮面裝飾效果','減輕套筒重量','防止套筒生鏽'], answer:0, explain:'Flank Drive 以接觸螺帽側壁而非尖角，降低滑牙風險、提升扭力傳遞。' },
+  { q:'Snap-on 的工具為什麼大多採用鍍鉻處理?', options:['防鏽與易清潔','讓重量更輕','提升導電性','減少生產成本'], answer:0, explain:'鉻鍍層可抗腐蝕、表面平滑易於清潔，延長工具壽命與專業外觀。' },
+  { q:'Snap-on 的衝擊套筒與普通套筒最大差異是?', options:['採用耐衝擊鋼材與厚壁設計','全部採亮面塗裝','僅能單次使用','不可用於氣動工具'], answer:0, explain:'衝擊套筒使用衝擊級鋼材、壁厚較厚以吸收衝擊力，適合搭配氣動/電動衝擊工具。' },
+  { q:'Snap-on 的棘輪扳手特色之一是?', options:['齒數多、角度細小，旋轉更精準','僅能單向使用','全部無鍍層','需經過校正才能使用'], answer:0, explain:'高齒數帶來較小的最小擺角（swing arc），在狹小空間更好操作。' },
+  { q:'Snap-on 旗下的 Bahco 品牌最廣為人知的代表產品是什麼?', options:['活動扳手','銼刀','鋸片','鉗子'], answer:0, explain:'Bahco 以活動扳手（Adjustable Wrench）最廣為人知。' },
+];
+
+/********************
+ * 2) 狀態與設定
+ ********************/
+let state = {
+  idx: 0,
+  score: 0,
+  selected: {}, // 單選：number
+  startAt: Date.now(),
+  finished: false,
+};
+const POINTS_PER_Q = 1; // 每題配分
+
+/********************
+ * 3) 工具函式與元素
+ ********************/
+const $ = (s)=>document.querySelector(s);
+const quizEl = $('#quiz');
+const progressEl = $('#progress');
+const scoreEl = $('#score');
+const timerEl = $('#timer');
+const prevBtn = $('#prev');
+const nextBtn = $('#next');
+const finishBtn = $('#finish');
+const restartBtn = $('#restart');
+const progressFill = $('#progressFill');
+const summaryEl = $('#summary');
+const bodyEl = document.body;
+const backgroundClasses = ['bg-1', 'bg-2'];
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function updateBackground(){
+  bodyEl.classList.remove(...backgroundClasses);
+  if(!backgroundClasses.length) return;
+  const classIdx = Math.min(state.idx, backgroundClasses.length-1);
+  bodyEl.classList.add(backgroundClasses[classIdx]);
+}
+
+function render(){
+  const total = QUESTIONS.length;
+  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
+  scoreEl.textContent = `得分：${state.score}`;
+  prevBtn.disabled = state.idx === 0;
+  nextBtn.style.display = state.idx < total-1 ? 'inline-block' : 'none';
+  finishBtn.style.display = state.idx === total-1 ? 'inline-block' : 'none';
+  const atFirst = state.idx === 0;
+  const atLast = state.idx === total-1;
+  prevBtn.disabled = atFirst;
+  const answeredCount = Object.keys(state.selected).length;
+  const progressPercent = total ? Math.round(Math.min(answeredCount, total) / total * 100) : 0;
+  progressFill.style.width = `${progressPercent}%`;
+  updateBackground();
+
+  if(state.finished){
+    nextBtn.style.display = 'inline-block';
+    nextBtn.disabled = atLast;
+    finishBtn.style.display = 'none';
+    restartBtn.style.display = 'inline-block';
+  }else{
+    nextBtn.style.display = atLast ? 'none' : 'inline-block';
+    nextBtn.disabled = false;
+    finishBtn.style.display = atLast ? 'inline-block' : 'none';
+    restartBtn.style.display = 'none';
+  }
+
+  const q = QUESTIONS[state.idx];
+  quizEl.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const qEl = document.createElement('div');
+  qEl.className = 'q';
+  qEl.textContent = q.q;
+  card.appendChild(qEl);
+
+  const choices = document.createElement('div');
+  choices.className = 'choices';
+
+  q.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = `${'ABCD'[i]}. ${opt}`;
+
+    const sel = state.selected[state.idx];
+    if(sel === i) btn.classList.add('selected');
+
+    btn.addEventListener('click', ()=>{
+      state.selected[state.idx] = i;
+      render();
+    });
+    if(state.finished){
+      btn.disabled = true;
+      if(i === q.answer) btn.classList.add('correct');
+      if(typeof sel === 'number' && sel === i && sel !== q.answer) btn.classList.add('wrong');
+    }else{
+      btn.addEventListener('click', ()=>{
+        state.selected[state.idx] = i;
+        render();
+      });
+    }
+
+    choices.appendChild(btn);
+  });
+
+  card.appendChild(choices);
+  quizEl.appendChild(card);
+}
+
+function grade(){
+  let score = 0;
+  const details = [];
+  QUESTIONS.forEach((q, i)=>{
+    const sel = state.selected[i];
+    const correct = sel === q.answer;
+    if(correct) score += POINTS_PER_Q;
+    details.push({
+      q: q.q,
+      selected: typeof sel === 'number' ? `${'ABCD'[sel]}. ${q.options[sel]}` : '(未作答)',
+      answer: `${'ABCD'[q.answer]}. ${q.options[q.answer]}`,
+      correct,
+      explain: q.explain || ''
+    });
+  });
+  state.score = score;
+  state.finished = true;
+  render();
+
+  const maxScore = QUESTIONS.length * POINTS_PER_Q;
+  const percent = Math.round(score / maxScore * 100);
+  const used = Math.round((Date.now()-state.startAt)/1000);
+
+  // 成績摘要 + 玩家表單
+  summaryEl.innerHTML = `
+    <div class="result">
+      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）&nbsp;&nbsp;|&nbsp;&nbsp;<strong>花費時間</strong>：${formatTime(used)}
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3 style="margin:0 0 8px">玩家資訊</h3>
+      <form id="playerForm" onsubmit="return false;">
+        <div class="grid">
+          <div>
+            <label>姓名 *</label>
+            <input type="text" id="name" required placeholder="王小明" />
+          </div>
+          <div>
+            <label>公司/學校<\/label>
+            <input type="text" id="company" placeholder="公司/學校" />
+          </div>
+          <div>
+            <label>電話 *</label>
 @@ -296,39 +355,60 @@ function bindFormButtons(payload){
-     const key = 'quiz_records_v1';
-     const all = JSON.parse(localStorage.getItem(key) || '[]');
-     if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
-     const header = Object.keys(all[0]);
-     const rows = [header.join(',')].concat(all.map(obj=> header.map(h=>`"${String(obj[h]??'').replaceAll('"','""')}"`).join(',')));
-     const blob = new Blob(["\ufeff" + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
-     const a = document.createElement('a');
-     a.href = URL.createObjectURL(blob);
-     a.download = 'quiz_records.csv';
-     a.click();
-   });
- 
-   clearBtn.addEventListener('click', ()=>{
-     if(confirm('確定要清空這台裝置上的所有玩家資料？')){
-       localStorage.removeItem('quiz_records_v1');
-       alert('已清空。');
-     }
-   });
- }
- 
- /********************
-  * 4) 事件與初始化
-  ********************/
- prevBtn.addEventListener('click', ()=>{ if(state.idx>0){ state.idx--; render(); }});
- nextBtn.addEventListener('click', ()=>{ if(state.idx<QUESTIONS.length-1){ state.idx++; render(); }});
--finishBtn.addEventListener('click', grade);
-+finishBtn.addEventListener('click', ()=>{
-+  const firstUnanswered = QUESTIONS.findIndex((_, idx)=> typeof state.selected[idx] !== 'number');
-+  if(firstUnanswered !== -1){
-+    alert(`第 ${firstUnanswered+1} 題尚未作答`);
-+    state.idx = firstUnanswered;
-+    render();
-+    return;
-+  }
-+  grade();
-+});
-+restartBtn.addEventListener('click', ()=>{
-+  state = {
-+    idx: 0,
-+    score: 0,
-+    selected: {},
-+    startAt: Date.now(),
-+    finished: false,
-+  };
-+  timerEl.textContent = '00:00';
-+  summaryEl.innerHTML = '';
-+  render();
-+});
- 
- // 計時器
- setInterval(()=>{
-   if(state.finished) return;
-   const sec = (Date.now()-state.startAt)/1000;
-   timerEl.textContent = formatTime(sec);
- }, 1000);
- 
- // 初次繪製
- render();
- </script>
- </body>
- </html>
+    const key = 'quiz_records_v1';
+    const all = JSON.parse(localStorage.getItem(key) || '[]');
+    if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
+    const header = Object.keys(all[0]);
+    const rows = [header.join(',')].concat(all.map(obj=> header.map(h=>`"${String(obj[h]??'').replaceAll('"','""')}"`).join(',')));
+    const blob = new Blob(["\ufeff" + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'quiz_records.csv';
+    a.click();
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    if(confirm('確定要清空這台裝置上的所有玩家資料？')){
+      localStorage.removeItem('quiz_records_v1');
+      alert('已清空。');
+    }
+  });
+}
+
+/********************
+ * 4) 事件與初始化
+ ********************/
+prevBtn.addEventListener('click', ()=>{ if(state.idx>0){ state.idx--; render(); }});
+nextBtn.addEventListener('click', ()=>{ if(state.idx<QUESTIONS.length-1){ state.idx++; render(); }});
+finishBtn.addEventListener('click', grade);
+finishBtn.addEventListener('click', ()=>{
+  const firstUnanswered = QUESTIONS.findIndex((_, idx)=> typeof state.selected[idx] !== 'number');
+  if(firstUnanswered !== -1){
+    alert(`第 ${firstUnanswered+1} 題尚未作答`);
+    state.idx = firstUnanswered;
+    render();
+    return;
+  }
+  grade();
+});
+restartBtn.addEventListener('click', ()=>{
+  state = {
+    idx: 0,
+    score: 0,
+    selected: {},
+    startAt: Date.now(),
+    finished: false,
+  };
+  timerEl.textContent = '00:00';
+  summaryEl.innerHTML = '';
+  render();
+});
+
+// 計時器
+setInterval(()=>{
+  if(state.finished) return;
+  const sec = (Date.now()-state.startAt)/1000;
+  timerEl.textContent = formatTime(sec);
+}, 1000);
+
+// 初次繪製
+render();
+</script>
+</body>
+</html>
