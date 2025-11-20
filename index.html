@@ -8,12 +8,13 @@
   <style>
     :root{ --w: min(920px, 94vw); }
     html, body { height: 100%; }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* ✅ 背景圖改為 assets/01.png */
-      background: #0f172a url('assets/01.png') center/cover no-repeat fixed;
+      /* ✅ 背景圖改為 assets/01.png，並縮小到 90% */
+      background: #0f172a url('assets/01.png') center/90% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
     body::before{
@@ -24,11 +25,24 @@
       z-index:-1;
     }
 
-    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
-    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
+    /* ✅ 標題、題目容器放在右半邊（靠右對齊） */
+    header{
+      max-width:var(--w);
+      margin:30px 4vw 10px auto;   /* top right bottom left */
+      padding:0 8px;
+    }
+    h1{
+      margin:0;
+      font-size: clamp(24px, 5vw, 38px);
+      letter-spacing:.5px;
+    }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
+    main{
+      max-width:var(--w);
+      margin:10px 4vw 60px auto;   /* 靠右 */
+      padding:16px;
+    }
 
     .card{
       background:#0b1220cc;
@@ -118,7 +132,7 @@
 
     footer{
       max-width:var(--w);
-      margin: 0 auto 30px;
+      margin:0 4vw 30px auto;      /* 靠右 */
       padding:0 8px;
       color:#cbd5e1;
       font-size:12px;
@@ -132,6 +146,15 @@
       z-index:10;
       pointer-events:none;
       border-radius:12px;
+    }
+
+    /* 小螢幕的時候，可視需要讓內容置中
+       如果你希望手機也維持靠右，可以把下面 @media 整段刪掉 */
+    @media (max-width: 640px){
+      header, main, footer{
+        margin-left:auto;
+        margin-right:auto;
+      }
     }
   </style>
 </head>
@@ -178,7 +201,6 @@
 <script>
 /********************
  * 1) 題庫（示範：6 題）
- *    想改題目就改這裡
  ********************/
 const QUESTIONS = [
   {
@@ -317,7 +339,6 @@ function grade(){
   const percent  = Math.round((score / maxScore) * 100);
   const used     = Math.round((Date.now() - state.startAt) / 1000);
 
-  // ✅ 只顯示總分數 + 作答時間
   summaryEl.innerHTML = `
     <div class="result">
       <strong>成績</strong>：${score} / ${maxScore}（${percent}%）<br>
@@ -325,7 +346,6 @@ function grade(){
     </div>
   `;
 
-  // 捲到成績區
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
