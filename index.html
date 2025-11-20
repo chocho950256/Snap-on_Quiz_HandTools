@@ -16,7 +16,7 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* ✅ 背景圖縮到 75%，並向下移 10% */
+      /* 背景圖縮到 75%，並向下移 10% */
       background: #0f172a url('assets/01.png') center 60% / 75% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
@@ -28,12 +28,10 @@
       z-index:-1;
     }
 
-    /* === 右半部版面設定 === */
-
-    /* ✅ 標題區放在畫面更右側：寬度縮到 45vw */
+    /* === 標題區：放在畫面右側，稍微再往下 === */
     header{
       width: min(45vw, var(--w));
-      margin:30px 0 10px auto;  /* top right bottom left, 靠右 */
+      margin:60px 0 10px auto;  /* top right bottom left, 上移→60px */
       padding:0 8px;
     }
     header > *{
@@ -48,14 +46,14 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    /* ✅ 題目區在畫面右半部，但內容在這個區塊內置中，整體比上一版稍微往左回來 */
+    /* === 題目區：在畫面右半部，但整塊往左移一些 === */
     main{
       width: min(50vw, var(--w));
-      margin:10px 0 60px auto;   /* 靠右 */
+      margin:10px 20vw 60px auto;   /* 右邊留 20vw → 整塊往左移 */
       padding:16px;
       display:flex;
       flex-direction:column;
-      align-items:center;        /* 內容在 main 內置中 */
+      align-items:flex-start;       /* 子元素靠 main 的左邊，方便與題目對齊 */
     }
 
     .card{
@@ -65,24 +63,8 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      /* ✅ 題目黑底只占 main 寬度的 90%（約一半畫面寬） */
+      /* 題目黑底只占 main 寬度 90%，約一半畫面寬 */
       width:90%;
-    }
-
-    /* 這裡只剩進度需要的樣式，分數與計時已移除 */
-    .meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      color:#cbd5e1;
-      font-size:14px;
-    }
-    .pill{
-      background:#111827cc;
-      padding:6px 12px;
-      border-radius:999px;
-      border:1px solid #334155;
     }
 
     .q{
@@ -115,13 +97,14 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
+    /* 下一題/上一題按鈕區：與題目卡片同寬、左邊對齊 */
     .controls{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
       margin-top:14px;
-      width:90%;           /* 跟 card 寬度一致 */
+      width:90%;           /* 跟 .card 一樣寬 → 左右邊緣平行 */
     }
     .btn{
       background:#2563eb;
@@ -144,7 +127,7 @@
       background:#052e16;
       border:1px solid #14532d;
       color:#bbf7d0;
-      width:90%;           /* 成績區也對齊右半部黑底 */
+      width:90%;           /* 成績區也對齊題目 */
       margin-top:16px;
     }
 
@@ -152,7 +135,7 @@
 
     footer{
       width: min(50vw, var(--w));
-      margin:0 0 30px auto;      /* 靠右 */
+      margin:0 20vw 30px auto;      /* 和 main 一樣右邊留 20vw */
       padding:0 8px;
       color:#cbd5e1;
       font-size:12px;
@@ -174,12 +157,21 @@
 
     /* 📱 小螢幕：改為置中 + 全寬 */
     @media (max-width: 640px){
-      header, main, footer{
+      header{
+        width: var(--w);
+        margin:40px auto 10px;
+      }
+      header > *{
+        max-width:100%;
+        margin-left:0;
+      }
+
+      main, footer{
         width: var(--w);
         margin-left:auto;
         margin-right:auto;
       }
-      header > *, footer > *{
+      footer > *{
         max-width:100%;
         margin-left:0;
       }
@@ -204,11 +196,6 @@
   </header>
 
   <main>
-    <!-- ✅ 只留下進度，不顯示得分 / 計時 -->
-    <div class="meta card" id="hud">
-      <span id="progress" class="pill">第 1/6 題</span>
-    </div>
-
     <!-- 題目區 -->
     <div id="quiz"></div>
 
@@ -240,14 +227,19 @@ const QUESTIONS = [
   {
     q:'Snap-on 成立於哪一年？',
     options:['1910 年','1920 年','1930 年','1940 年'],
-    answer:1,  // ✅ 正確答案：1920 年
+    answer:1,  // 正確答案：1920 年
     explain:'Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟百年專業工具旅程。'
   },
   {
-    q:'下列何者不是 Git 基本動作？',
-    options:['commit','push','pull','compile'],
-    answer:3,
-    explain:'compile 是編譯，Git 動作不是它。'
+    q:'Snap-on 創辦人 Joseph Johnson 當年設計的口號是？',
+    options:[
+      '一套工具做全部的事！',
+      '五個工具幹五十件活！',
+      '速度決定一切！',
+      '讓工具會思考！'
+    ],
+    answer:1, // ✅ 正確答案：五個工具幹五十件活！
+    explain:'最早的口號是「五個工具幹五十件活！（Five do the work of fifty!）」'
   },
   {
     q:'建立新分支常用指令？',
@@ -293,7 +285,6 @@ const POINTS_PER_Q = 1; // 每題配分
  ********************/
 const $  = (s)=>document.querySelector(s);
 const quizEl     = $('#quiz');
-const progressEl = $('#progress');
 const prevBtn    = $('#prev');
 const nextBtn    = $('#next');
 const finishBtn  = $('#finish');
@@ -311,8 +302,6 @@ function formatTime(sec){
 function render(){
   const total = QUESTIONS.length;
 
-  // 更新進度
-  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
   prevBtn.disabled       = state.idx === 0;
   nextBtn.style.display  = state.idx < total-1 ? 'inline-block' : 'none';
   finishBtn.style.display= state.idx === total-1 ? 'inline-block' : 'none';
