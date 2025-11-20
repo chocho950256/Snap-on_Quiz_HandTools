@@ -46,14 +46,14 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    /* === 題目區：在畫面右半部，但整塊往左移一些 === */
+    /* === 題目區：寬度與 header 一致，整組在標題正下方靠右 === */
     main{
-      width: min(50vw, var(--w));
-      margin:10px 20vw 60px auto;   /* 右邊留 20vw → 整塊往左移 */
+      width: min(45vw, var(--w));
+      margin:10px 0 60px auto;   /* 和 header 一樣靠右 */
       padding:16px;
       display:flex;
       flex-direction:column;
-      align-items:flex-start;
+      align-items:flex-end;      /* 內容向右對齊，對齊標題 */
     }
 
     .card{
@@ -63,7 +63,7 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      width:90%;   /* 題目黑底只占 main 寬度 90%（約右半畫面） */
+      width:90%;   /* 題目黑底只占 main 寬度的 90% */
     }
 
     .q{
@@ -96,14 +96,14 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 下一題/交卷按鈕：與題目卡片同寬、左邊對齊（題目正下方） */
+    /* 下一題/交卷按鈕：與題目卡片同寬、右邊界也對齊 */
     .controls{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
       margin-top:14px;
-      width:90%;           /* 跟 .card 一樣寬 → 平行 */
+      width:90%;           /* 跟 .card 一樣寬，緊貼題目下方 */
     }
     .btn{
       background:#2563eb;
@@ -133,8 +133,8 @@
     .small{ font-size:12px; color:#94a3b8; }
 
     footer{
-      width: min(50vw, var(--w));
-      margin:0 20vw 30px auto;
+      width: min(45vw, var(--w));
+      margin:0 0 30px auto;
       padding:0 8px;
       color:#cbd5e1;
       font-size:12px;
@@ -195,10 +195,10 @@
   </header>
 
   <main>
-    <!-- 題目區（在下一題按鈕正上方） -->
+    <!-- 題目區：就在下一題按鈕上方、同寬 -->
     <div id="quiz"></div>
 
-    <!-- 下方控制按鈕（已拿掉「上一題」） -->
+    <!-- 下方控制按鈕（只有下一題 / 交卷） -->
     <div class="controls">
       <button id="next" class="btn">下一題</button>
       <div style="flex:1"></div>
@@ -247,14 +247,19 @@ const QUESTIONS = [
       '第一台氣動工具',
       '第一台工具車'
     ],
-    answer:1, // ✅ 正確答案：No. 6 棘輪扳手
+    answer:1, // 正確答案：No. 6 棘輪扳手
     explain:'Snap-on 最早取得專利的產品是 No. 6 棘輪扳手。'
   },
   {
-    q:'README.md 通常使用哪種語法？',
-    options:['Markdown','LaTeX','CSV','SQL'],
-    answer:0,
-    explain:'GitHub README 預設採 Markdown。'
+    q:'二戰時期，Snap-on 的工具主要支援哪個領域？',
+    options:[
+      '家庭修繕',
+      '摩托車改裝',
+      '農業機具',
+      '航空與軍用維修'
+    ],
+    answer:3, // ✅ 正確答案：航空與軍用維修
+    explain:'二戰期間，Snap-on 工具廣泛應用於軍用車輛與航空維修，支援軍事與航空領域。'
   },
   {
     q:'想把程式變更上傳到遠端，需使用？',
