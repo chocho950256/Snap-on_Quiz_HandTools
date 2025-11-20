@@ -28,10 +28,10 @@
       z-index:-1;
     }
 
-    /* === 標題區：放在畫面右側，稍微再往下 === */
+    /* === 標題區：放在畫面右側，稍微往下 === */
     header{
       width: min(45vw, var(--w));
-      margin:60px 0 10px auto;  /* top right bottom left, 上移→60px */
+      margin:60px 0 10px auto;  /* top right bottom left */
       padding:0 8px;
     }
     header > *{
@@ -53,7 +53,7 @@
       padding:16px;
       display:flex;
       flex-direction:column;
-      align-items:flex-start;       /* 子元素靠 main 的左邊，方便與題目對齊 */
+      align-items:flex-start;
     }
 
     .card{
@@ -63,8 +63,7 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      /* 題目黑底只占 main 寬度 90%，約一半畫面寬 */
-      width:90%;
+      width:90%;   /* 題目黑底只占 main 寬度 90%（約右半畫面） */
     }
 
     .q{
@@ -97,14 +96,14 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 下一題/上一題按鈕區：與題目卡片同寬、左邊對齊 */
+    /* 下一題/交卷按鈕：與題目卡片同寬、左邊對齊（題目正下方） */
     .controls{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
       margin-top:14px;
-      width:90%;           /* 跟 .card 一樣寬 → 左右邊緣平行 */
+      width:90%;           /* 跟 .card 一樣寬 → 平行 */
     }
     .btn{
       background:#2563eb;
@@ -127,7 +126,7 @@
       background:#052e16;
       border:1px solid #14532d;
       color:#bbf7d0;
-      width:90%;           /* 成績區也對齊題目 */
+      width:90%;
       margin-top:16px;
     }
 
@@ -135,7 +134,7 @@
 
     footer{
       width: min(50vw, var(--w));
-      margin:0 20vw 30px auto;      /* 和 main 一樣右邊留 20vw */
+      margin:0 20vw 30px auto;
       padding:0 8px;
       color:#cbd5e1;
       font-size:12px;
@@ -196,14 +195,13 @@
   </header>
 
   <main>
-    <!-- 題目區 -->
+    <!-- 題目區（在下一題按鈕正上方） -->
     <div id="quiz"></div>
 
-    <!-- 下方控制按鈕 -->
+    <!-- 下方控制按鈕（已拿掉「上一題」） -->
     <div class="controls">
-      <button id="prev" class="btn ghost" disabled>上一題</button>
-      <div style="flex:1"></div>
       <button id="next" class="btn">下一題</button>
+      <div style="flex:1"></div>
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
@@ -238,14 +236,19 @@ const QUESTIONS = [
       '速度決定一切！',
       '讓工具會思考！'
     ],
-    answer:1, // ✅ 正確答案：五個工具幹五十件活！
+    answer:1, // 正確答案：五個工具幹五十件活！
     explain:'最早的口號是「五個工具幹五十件活！（Five do the work of fifty!）」'
   },
   {
-    q:'建立新分支常用指令？',
-    options:['git branch 新分支名','git make branch','git split','git new'],
-    answer:0,
-    explain:'例如：git branch feature-x。'
+    q:'Snap-on 第一項專利產品是什麼？',
+    options:[
+      '可更換的套筒組',
+      'No. 6 棘輪扳手',
+      '第一台氣動工具',
+      '第一台工具車'
+    ],
+    answer:1, // ✅ 正確答案：No. 6 棘輪扳手
+    explain:'Snap-on 最早取得專利的產品是 No. 6 棘輪扳手。'
   },
   {
     q:'README.md 通常使用哪種語法？',
@@ -285,7 +288,6 @@ const POINTS_PER_Q = 1; // 每題配分
  ********************/
 const $  = (s)=>document.querySelector(s);
 const quizEl     = $('#quiz');
-const prevBtn    = $('#prev');
 const nextBtn    = $('#next');
 const finishBtn  = $('#finish');
 const summaryEl  = $('#summary');
@@ -302,7 +304,6 @@ function formatTime(sec){
 function render(){
   const total = QUESTIONS.length;
 
-  prevBtn.disabled       = state.idx === 0;
   nextBtn.style.display  = state.idx < total-1 ? 'inline-block' : 'none';
   finishBtn.style.display= state.idx === total-1 ? 'inline-block' : 'none';
 
@@ -372,13 +373,6 @@ function grade(){
 /********************
  * 6) 事件與初始化
  ********************/
-prevBtn.addEventListener('click', () => {
-  if (state.idx > 0) {
-    state.idx--;
-    render();
-  }
-});
-
 nextBtn.addEventListener('click', () => {
   if (state.idx < QUESTIONS.length - 1) {
     state.idx++;
