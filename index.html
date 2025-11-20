@@ -1,338 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Snap-on 小小知識王</title>
-  <!-- SheetJS：用來輸出 Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
-    :root{ --w: min(920px, 94vw); }
-    html, body { height: 100%; }
-    body{
-      margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
-      color:#e5e7eb;
-      background: #0f172a url('assets/BackGround.png') center/cover no-repeat fixed;
-    }
-    /* 背景遮罩，讓文字更清楚 */
-    body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
-
-    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
-    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
-    p.sub{ margin:6px 0 0; color:#cbd5e1; }
-
-    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
-
-    .card{ background:#0b1220cc; border:1px solid #1f2937; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 10px 30px rgba(0,0,0,.25); }
-    .meta{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#cbd5e1; font-size:14px; }
-    .pill{ background:#111827cc; padding:6px 12px; border-radius:999px; border:1px solid #334155; }
-
-    .q{ font-weight:800; font-size:20px; margin:6px 0 12px; }
-    .choices{ display:grid; grid-template-columns:1fr; gap:12px; }
-    .choices button{ text-align:left; border:1px solid #334155; background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:12px; cursor:pointer; transition: transform .02s ease-in, border-color .15s ease; }
-    .choices button:hover{ transform: translateY(-1px); border-color:#60a5fa; }
-    .choices button.selected{ border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) inset; }
-
-    .controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; }
-    .btn{ background:#2563eb; color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
-    .btn.ghost{ background:transparent; border:1px solid #334155; color:#e5e7eb; }
-    .btn.warn{ background:#991b1b; }
-
-    .result{ padding:16px; border-radius:12px; background:#052e16; border:1px solid #14532d; color:#bbf7d0; }
-    .small{ font-size:12px; color:#94a3b8; }
-
-    form label{ display:block; font-weight:700; margin: 10px 0 6px; }
-    input[type="text"], input[type="email"]{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
-    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
-
-    footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
-    .corner-gif{ position:fixed; top:12px; left:12px; width:96px; z-index:10; pointer-events:none; border-radius:12px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Snap-on 知識挑戰賽 - Hand Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
-  <header>
-    <h1>Snap-on 小小知識王</h1>
-    <p class="sub">測試看看你對Snap-on工具的了解程度</p>
-  </header>
+  <div id="app">
+    <!-- 封面畫面：使用 P1 -->
+    <section id="introScreen" class="screen screen-intro active">
+      <button id="startButton" class="primary-btn">
+        開始挑戰
+      </button>
+    </section>
 
-  <main>
-    <div class="meta card" id="hud">
-      <span id="progress" class="pill">第 1/6 題</span>
-      <span id="score" class="pill">得分：0</span>
-      <span id="timer" class="pill">00:00</span>
-    </div>
+    <!-- 題目畫面：使用 P2 -->
+    <section id="questionScreen" class="screen screen-question">
+      <!-- 四個透明的點擊區，對應 1910 / 1920 / 1930 / 1940 -->
+      <button class="answer-hitbox" data-option="1910" style="--row:1;"></button>
+      <button class="answer-hitbox" data-option="1920" data-correct="true" style="--row:2;"></button>
+      <button class="answer-hitbox" data-option="1930" style="--row:3;"></button>
+      <button class="answer-hitbox" data-option="1940" style="--row:4;"></button>
 
-    <div id="quiz"></div>
+      <div id="feedback" class="feedback">
+        再想想看～
+      </div>
+    </section>
 
-    <div class="controls">
-      <button id="prev" class="btn ghost" disabled>上一題</button>
-      <div style="flex:1"></div>
-      <button id="next" class="btn">下一題</button>
-      <button id="finish" class="btn" style="display:none">交卷</button>
-    </div>
+    <!-- 解答畫面：使用 P3 -->
+    <section id="answerScreen" class="screen screen-answer">
+      <button id="restartButton" class="primary-btn">
+        再玩一次
+      </button>
+    </section>
+  </div>
 
-    <div id="summary" style="margin-top:16px"></div>
-  </main>
-
-  <footer>
-    <p class="small">自訂：在 <code>const QUESTIONS = [
-  { q:'Snap-on 常見的「Level 5 ATC 系統」主要功能是什麼?', options:['自動化工具控管與追蹤','工具自動校正精度','自動平衡輪胎','自動辨識車輛故障碼'], answer:0, explain:'Level 5 ATC（Asset Tracking & Control）可對工具資產進行授權、追蹤與紀錄，提高管理效率與防遺失。' },
-  { q:'Snap-on 的套筒內部常見的「Flank Drive」設計主要作用是?', options:['避免螺絲滑牙','增加亮面裝飾效果','減輕套筒重量','防止套筒生鏽'], answer:0, explain:'Flank Drive 以接觸螺帽側壁而非尖角，降低滑牙風險、提升扭力傳遞。' },
-  { q:'Snap-on 的工具為什麼大多採用鍍鉻處理?', options:['防鏽與易清潔','讓重量更輕','提升導電性','減少生產成本'], answer:0, explain:'鉻鍍層可抗腐蝕、表面平滑易於清潔，延長工具壽命與專業外觀。' },
-  { q:'Snap-on 的衝擊套筒與普通套筒最大差異是?', options:['採用耐衝擊鋼材與厚壁設計','全部採亮面塗裝','僅能單次使用','不可用於氣動工具'], answer:0, explain:'衝擊套筒使用衝擊級鋼材、壁厚較厚以吸收衝擊力，適合搭配氣動/電動衝擊工具。' },
-  { q:'Snap-on 的棘輪扳手特色之一是?', options:['齒數多、角度細小，旋轉更精準','僅能單向使用','全部無鍍層','需經過校正才能使用'], answer:0, explain:'高齒數帶來較小的最小擺角（swing arc），在狹小空間更好操作。' },
-  { q:'Snap-on 旗下的 Bahco 品牌最廣為人知的代表產品是什麼?', options:['活動扳手','銼刀','鋸片','鉗子'], answer:0, explain:'Bahco 以活動扳手（Adjustable Wrench）最廣為人知。' },
-];</code> 改題庫；把你的背景動圖放在 <code>assets/BackGround.png</code>，或改成 <code>jpg/mp4</code> 皆可。</p>
-  </footer>
-
-<script>
-/********************
- * 1) 題庫（四選項 × 6 題）
- ********************/
-const QUESTIONS = [
-  { q:'GitHub Pages 主要用途是？', options:['部署靜態網站','當資料庫用','寄發電子報','執行雲端函式'], answer:0, explain:'Pages 會把 HTML/CSS/JS 公開成網站。' },
-  { q:'下列何者不是 Git 基本動作？', options:['commit','push','pull','compile'], answer:3, explain:'compile 是編譯，Git 動作不是它。' },
-  { q:'建立新分支常用指令？', options:['git branch 新分支名','git make branch','git split','git new'], answer:0, explain:'git branch feature-x。' },
-  { q:'README.md 通常使用哪種語法？', options:['Markdown','LaTeX','CSV','SQL'], answer:0, explain:'README 預設採 Markdown。' },
-  { q:'想把程式變更上傳到遠端，需使用？', options:['git push','git add remote','git upload','git send'], answer:0, explain:'本地 commit 後用 git push。' },
-  { q:'Issues 適合用來？', options:['追蹤問題/需求','佈署靜態網站','儲存二進位檔','執行排程器'], answer:0, explain:'Issues=協作追蹤問題/任務。' },
-];
-
-/********************
- * 2) 狀態與設定
- ********************/
-let state = {
-  idx: 0,
-  score: 0,
-  selected: {}, // 單選：number
-  startAt: Date.now(),
-  finished: false,
-};
-const POINTS_PER_Q = 1; // 每題配分
-
-/********************
- * 3) 工具函式
- ********************/
-const $ = (s)=>document.querySelector(s);
-const quizEl = $('#quiz');
-const progressEl = $('#progress');
-const scoreEl = $('#score');
-const timerEl = $('#timer');
-const prevBtn = $('#prev');
-const nextBtn = $('#next');
-const finishBtn = $('#finish');
-const summaryEl = $('#summary');
-
-function formatTime(sec){
-  const m = Math.floor(sec/60).toString().padStart(2,'0');
-  const s = Math.floor(sec%60).toString().padStart(2,'0');
-  return `${m}:${s}`;
-}
-
-function render(){
-  const total = QUESTIONS.length;
-  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
-  scoreEl.textContent = `得分：${state.score}`;
-  prevBtn.disabled = state.idx === 0;
-  nextBtn.style.display = state.idx < total-1 ? 'inline-block' : 'none';
-  finishBtn.style.display = state.idx === total-1 ? 'inline-block' : 'none';
-
-  const q = QUESTIONS[state.idx];
-  quizEl.innerHTML = '';
-
-  const card = document.createElement('div');
-  card.className = 'card';
-
-  const qEl = document.createElement('div');
-  qEl.className = 'q';
-  qEl.textContent = q.q;
-  card.appendChild(qEl);
-
-  const choices = document.createElement('div');
-  choices.className = 'choices';
-
-  q.options.forEach((opt, i)=>{
-    const btn = document.createElement('button');
-    btn.textContent = `${'ABCD'[i]}. ${opt}`;
-
-    const sel = state.selected[state.idx];
-    if(sel === i) btn.classList.add('selected');
-
-    btn.addEventListener('click', ()=>{
-      state.selected[state.idx] = i;
-      render();
-    });
-
-    choices.appendChild(btn);
-  });
-
-  card.appendChild(choices);
-  quizEl.appendChild(card);
-}
-
-function grade(){
-  let score = 0;
-  const details = [];
-  QUESTIONS.forEach((q, i)=>{
-    const sel = state.selected[i];
-    const correct = sel === q.answer;
-    if(correct) score += POINTS_PER_Q;
-    details.push({
-      q: q.q,
-      selected: typeof sel === 'number' ? `${'ABCD'[sel]}. ${q.options[sel]}` : '(未作答)',
-      answer: `${'ABCD'[q.answer]}. ${q.options[q.answer]}`,
-      correct,
-      explain: q.explain || ''
-    });
-  });
-  state.score = score;
-  state.finished = true;
-
-  const maxScore = QUESTIONS.length * POINTS_PER_Q;
-  const percent = Math.round(score / maxScore * 100);
-  const used = Math.round((Date.now()-state.startAt)/1000);
-
-  // 成績摘要 + 玩家表單
-  summaryEl.innerHTML = `
-    <div class="result">
-      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）&nbsp;&nbsp;|&nbsp;&nbsp;<strong>花費時間</strong>：${formatTime(used)}
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <h3 style="margin:0 0 8px">玩家資訊</h3>
-      <form id="playerForm" onsubmit="return false;">
-        <div class="grid">
-          <div>
-            <label>姓名 *</label>
-            <input type="text" id="name" required placeholder="王小明" />
-          </div>
-          <div>
-            <label>公司</label>
-            <input type="text" id="company" placeholder="範例股份有限公司" />
-          </div>
-          <div>
-            <label>電話 *</label>
-            <input type="text" id="phone" required placeholder="09xx-xxx-xxx" />
-          </div>
-          <div>
-            <label>Email *</label>
-            <input type="email" id="email" required placeholder="user@example.com" />
-          </div>
-        </div>
-        <div class="controls" style="margin-top:16px">
-          <button id="savePlayer" class="btn">儲存這位玩家</button>
-          <div style="flex:1"></div>
-          <button id="downloadExcel" class="btn">下載 Excel</button>
-          <button id="downloadCSV" class="btn ghost">下載 CSV</button>
-          <button id="clearAll" class="btn warn">清空本機資料</button>
-        </div>
-        <p class="small">提示：資料僅儲存在這台裝置的瀏覽器（localStorage）。如需雲端蒐集，改用 Google Sheet / 後端 API。</p>
-      </form>
-    </div>
-
-    <div style="margin-top:10px">
-      ${details.map((d,idx)=>`
-        <div class="card" style="background:#0a1a2fcc">
-          <div class="q">第 ${idx+1} 題：${d.q}</div>
-          <div>${d.correct ? '✅ 正確' : '❌ 錯誤'}</div>
-          <div style="margin-top:6px">你的答案：${d.selected}</div>
-          <div>正確答案：${d.answer}</div>
-          ${d.explain ? `<div style="margin-top:6px; color:#a7f3d0">解析：${d.explain}</div>`:''}
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  // 綁定表單按鈕行為
-  bindFormButtons({score, maxScore, percent, used, details});
-  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-}
-
-function bindFormButtons(payload){
-  const f = {
-    name: $('#name'), company: $('#company'), phone: $('#phone'), email: $('#email')
-  };
-  const saveBtn = $('#savePlayer');
-  const excelBtn = $('#downloadExcel');
-  const csvBtn = $('#downloadCSV');
-  const clearBtn = $('#clearAll');
-
-  saveBtn.addEventListener('click', ()=>{
-    // 驗證
-    if(!f.name.value.trim()){ alert('請填寫姓名'); return; }
-    if(!/^[0-9+\-()\s]{6,}$/.test(f.phone.value.trim())){ alert('電話格式不太對'); return; }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())){ alert('Email 格式不太對'); return; }
-
-    const record = {
-      timestamp: new Date().toISOString(),
-      姓名: f.name.value.trim(),
-      公司: f.company.value.trim(),
-      電話: f.phone.value.trim(),
-      Email: f.email.value.trim(),
-      得分: payload.score,
-      總分: payload.maxScore,
-      百分比: payload.percent + '%',
-      花費秒數: payload.used,
-      // 也可存每題作答：
-      作答: payload.details.map((d,i)=>`Q${i+1}:${d.correct?'O':'X'}`).join(' ')
-    };
-
-    const key = 'quiz_records_v1';
-    const all = JSON.parse(localStorage.getItem(key) || '[]');
-    all.push(record);
-    localStorage.setItem(key, JSON.stringify(all));
-    alert('已儲存到本機（localStorage）。可繼續下載 Excel/CSV 或換下一位玩家作答。');
-  });
-
-  excelBtn.addEventListener('click', ()=>{
-    const key = 'quiz_records_v1';
-    const all = JSON.parse(localStorage.getItem(key) || '[]');
-    if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
-    const ws = XLSX.utils.json_to_sheet(all);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'records');
-    XLSX.writeFile(wb, 'quiz_records.xlsx');
-  });
-
-  csvBtn.addEventListener('click', ()=>{
-    const key = 'quiz_records_v1';
-    const all = JSON.parse(localStorage.getItem(key) || '[]');
-    if(!all.length){ alert('目前沒有已儲存的玩家資料'); return; }
-    const header = Object.keys(all[0]);
-    const rows = [header.join(',')].concat(all.map(obj=> header.map(h=>`"${String(obj[h]??'').replaceAll('"','""')}"`).join(',')));
-    const blob = new Blob(["\ufeff" + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'quiz_records.csv';
-    a.click();
-  });
-
-  clearBtn.addEventListener('click', ()=>{
-    if(confirm('確定要清空這台裝置上的所有玩家資料？')){
-      localStorage.removeItem('quiz_records_v1');
-      alert('已清空。');
-    }
-  });
-}
-
-/********************
- * 4) 事件與初始化
- ********************/
-prevBtn.addEventListener('click', ()=>{ if(state.idx>0){ state.idx--; render(); }});
-nextBtn.addEventListener('click', ()=>{ if(state.idx<QUESTIONS.length-1){ state.idx++; render(); }});
-finishBtn.addEventListener('click', grade);
-
-// 計時器
-setInterval(()=>{
-  if(state.finished) return;
-  const sec = (Date.now()-state.startAt)/1000;
-  timerEl.textContent = formatTime(sec);
-}, 1000);
-
-// 初次繪製
-render();
-</script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
