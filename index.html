@@ -1,240 +1,237 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Snap-on 知識挑戰賽 - Hand Tools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC",
+        "Microsoft JhengHei", sans-serif;
+    }
+
+    body {
+      background-color: #000;
+    }
+
+    /* 三個畫面通用設定 */
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* 封面背景 → assets/P1.jpg */
+    .screen-intro {
+      background-image: url("assets/P1.jpg");
+    }
+
+    /* 題目背景 → assets/P2.jpg */
+    .screen-question {
+      background-image: url("assets/P2.jpg");
+    }
+
+    /* 解答背景 → assets/P3.jpg */
+    .screen-answer {
+      background-image: url("assets/P3.jpg");
+    }
+
+    /* 共用主按鈕（封面「開始挑戰」、解答「再玩一次」） */
+    .primary-btn {
+      position: absolute;
+      left: 50%;
+      bottom: 7%;
+      transform: translateX(-50%);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: none;
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: #f5e1c5;
+      color: #5a2514;
+      letter-spacing: 0.08em;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        opacity 0.15s ease;
+      opacity: 0.96;
+    }
+
+    .primary-btn:hover {
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    .primary-btn:active {
+      transform: translateX(-50%) translateY(1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 題目畫面的透明點擊區 */
+    .screen-question {
+      position: fixed;
+    }
+
+    /* 四個 hitbox 共用樣式 */
+    .answer-hitbox {
+      position: absolute;
+      /* 控制 hitbox 的左右邊界（整體在右半部） */
+      left: 55%;
+      right: 8%;
+      height: 9%;
+      /* 使用 CSS 變數 --row 來計算 top 位置 */
+      top: calc(28% + (var(--row) - 1) * 13%);
+      background-color: rgba(255, 255, 255, 0); /* 完全透明 */
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 開發時想看範圍，可以暫時打開這段：
+    .answer-hitbox {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px dashed rgba(0, 0, 0, 0.3);
+    }
+    */
+
+    /* 答錯提示文字 */
+    .feedback {
+      position: absolute;
+      left: 50%;
+      bottom: 10%;
+      transform: translateX(-50%);
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fffaf0;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .feedback.show {
+      opacity: 1;
+    }
+  </style>
 </head>
+
 <body>
   <div id="app">
     <!-- 封面畫面：使用 P1 -->
     <section id="introScreen" class="screen screen-intro active">
-      <button id="startButton" class="primary-btn">
-        開始挑戰
-      </button>
+      <button id="startButton" class="primary-btn">開始挑戰</button>
     </section>
 
     <!-- 題目畫面：使用 P2 -->
     <section id="questionScreen" class="screen screen-question">
       <!-- 四個透明的點擊區，對應 1910 / 1920 / 1930 / 1940 -->
-      <button class="answer-hitbox" data-option="1910" style="--row:1;"></button>
-      <button class="answer-hitbox" data-option="1920" data-correct="true" style="--row:2;"></button>
-      <button class="answer-hitbox" data-option="1930" style="--row:3;"></button>
-      <button class="answer-hitbox" data-option="1940" style="--row:4;"></button>
+      <button class="answer-hitbox" data-option="1910" style="--row: 1"></button>
+      <button
+        class="answer-hitbox"
+        data-option="1920"
+        data-correct="true"
+        style="--row: 2"
+      ></button>
+      <button class="answer-hitbox" data-option="1930" style="--row: 3"></button>
+      <button class="answer-hitbox" data-option="1940" style="--row: 4"></button>
 
-      <div id="feedback" class="feedback">
-        再想想看～
-      </div>
+      <div id="feedback" class="feedback">再想想看～</div>
     </section>
 
     <!-- 解答畫面：使用 P3 -->
     <section id="answerScreen" class="screen screen-answer">
-      <button id="restartButton" class="primary-btn">
-        再玩一次
-      </button>
+      <button id="restartButton" class="primary-btn">再玩一次</button>
     </section>
   </div>
 
-  <script src="assets/js/app.js"></script>
-</body>
-</html>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const introScreen = document.getElementById("introScreen");
+      const questionScreen = document.getElementById("questionScreen");
+      const answerScreen = document.getElementById("answerScreen");
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC",
-    "Microsoft JhengHei", sans-serif;
-}
+      const startButton = document.getElementById("startButton");
+      const restartButton = document.getElementById("restartButton");
+      const feedback = document.getElementById("feedback");
 
-body {
-  background-color: #000;
-}
+      const answerButtons = document.querySelectorAll(".answer-hitbox");
+      const CORRECT_OPTION = "1920"; // 正確答案年份
 
-/* 三個畫面通用設定 */
-#app {
-  width: 100%;
-  height: 100%;
-}
+      function showScreen(target) {
+        [introScreen, questionScreen, answerScreen].forEach((screen) => {
+          screen.classList.remove("active");
+        });
 
-.screen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
+        switch (target) {
+          case "intro":
+            introScreen.classList.add("active");
+            break;
+          case "question":
+            questionScreen.classList.add("active");
+            break;
+          case "answer":
+            answerScreen.classList.add("active");
+            break;
+        }
+      }
 
-.screen.active {
-  display: block;
-}
+      // 開始挑戰 → 題目畫面
+      startButton.addEventListener("click", () => {
+        showScreen("question");
+      });
 
-/* 封面背景 → P1 */
-.screen-intro {
-  background-image: url("../P1.jpg");
-}
+      // 再玩一次 → 回到封面
+      restartButton.addEventListener("click", () => {
+        showScreen("intro");
+      });
 
-/* 題目背景 → P2 */
-.screen-question {
-  background-image: url("../P2.jpg");
-}
+      // 點選答案
+      answerButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const option = btn.dataset.option;
 
-/* 解答背景 → P3 */
-.screen-answer {
-  background-image: url("../P3.jpg");
-}
+          if (option === CORRECT_OPTION) {
+            // 答對 → 顯示解答畫面
+            showScreen("answer");
+          } else {
+            // 答錯 → 顯示提示
+            showFeedback();
+          }
+        });
+      });
 
-/* 共用主按鈕（封面「開始挑戰」、解答「再玩一次」） */
-.primary-btn {
-  position: absolute;
-  left: 50%;
-  bottom: 7%;
-  transform: translateX(-50%);
-  padding: 14px 32px;
-  border-radius: 999px;
-  border: none;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  background-color: #f5e1c5;
-  color: #5a2514;
-  letter-spacing: 0.08em;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-  opacity: 0.96;
-}
-
-.primary-btn:hover {
-  transform: translateX(-50%) translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
-}
-
-.primary-btn:active {
-  transform: translateX(-50%) translateY(1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-
-/* 題目畫面的透明點擊區 */
-
-/* 說明：
-   整張圖是 1920x1080，選項在右半部偏中間。
-   這裡用百分比 roughly 對齊四個長方形按鈕。
-   如果位置有點偏，你可以微調 left / right / height / top 的百分比。
-*/
-.screen-question {
-  position: fixed;
-}
-
-/* 四個 hitbox 共用樣式 */
-.answer-hitbox {
-  position: absolute;
-  /* 控制 hitbox 的左右邊界（整體在右半部） */
-  left: 55%;
-  right: 8%;
-  height: 9%;
-  /* 使用 CSS 變數 --row 來計算 top 位置 */
-  top: calc(28% + (var(--row) - 1) * 13%);
-  background-color: rgba(255, 255, 255, 0); /* 完全透明 */
-  border: none;
-  cursor: pointer;
-}
-
-/* 開發時想看範圍，可以暫時打開這個邊框： */
-/*
-.answer-hitbox {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px dashed rgba(0, 0, 0, 0.3);
-}
-*/
-
-/* 答錯提示文字 */
-.feedback {
-  position: absolute;
-  left: 50%;
-  bottom: 10%;
-  transform: translateX(-50%);
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.65);
-  color: #fffaf0;
-  font-size: 16px;
-  letter-spacing: 0.1em;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.feedback.show {
-  opacity: 1;
-}
-document.addEventListener("DOMContentLoaded", () => {
-  const introScreen = document.getElementById("introScreen");
-  const questionScreen = document.getElementById("questionScreen");
-  const answerScreen = document.getElementById("answerScreen");
-
-  const startButton = document.getElementById("startButton");
-  const restartButton = document.getElementById("restartButton");
-  const feedback = document.getElementById("feedback");
-
-  const answerButtons = document.querySelectorAll(".answer-hitbox");
-  const CORRECT_OPTION = "1920"; // 正確答案年份
-
-  function showScreen(target) {
-    [introScreen, questionScreen, answerScreen].forEach((screen) => {
-      screen.classList.remove("active");
-    });
-
-    switch (target) {
-      case "intro":
-        introScreen.classList.add("active");
-        break;
-      case "question":
-        questionScreen.classList.add("active");
-        break;
-      case "answer":
-        answerScreen.classList.add("active");
-        break;
-    }
-  }
-
-  // 開始挑戰 → 題目畫面
-  startButton.addEventListener("click", () => {
-    showScreen("question");
-  });
-
-  // 再玩一次 → 回到封面
-  restartButton.addEventListener("click", () => {
-    showScreen("intro");
-  });
-
-  // 點選答案
-  answerButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const option = btn.dataset.option;
-
-      if (option === CORRECT_OPTION) {
-        // 答對 → 顯示解答畫面
-        showScreen("answer");
-      } else {
-        // 答錯 → 顯示提示
-        showFeedback();
+      function showFeedback() {
+        if (!feedback) return;
+        feedback.classList.add("show");
+        setTimeout(() => {
+          feedback.classList.remove("show");
+        }, 1200);
       }
     });
-  });
-
-  function showFeedback() {
-    if (!feedback) return;
-    feedback.classList.add("show");
-    setTimeout(() => {
-      feedback.classList.remove("show");
-    }, 1200);
-  }
-});
+  </script>
+</body>
+</html>
