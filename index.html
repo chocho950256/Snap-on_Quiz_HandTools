@@ -16,8 +16,8 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* ✅ 背景圖縮小再 10%，並向下移 10%（center 60% / 80%） */
-      background: #0f172a url('assets/01.png') center 60% / 80% no-repeat fixed;
+      /* ✅ 背景圖縮到 75%，並向下移 10% */
+      background: #0f172a url('assets/01.png') center 60% / 75% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
     body::before{
@@ -30,16 +30,15 @@
 
     /* === 右半部版面設定 === */
 
-    /* 整個標題區放在畫面右半部，寬度最多 50vw */
+    /* ✅ 標題區放在畫面更右側：寬度縮到 45vw */
     header{
-      width: min(50vw, var(--w));
+      width: min(45vw, var(--w));
       margin:30px 0 10px auto;  /* top right bottom left, 靠右 */
       padding:0 8px;
     }
-    /* ✅ 讓標題文字本身只佔 header 的 90%，並靠右貼齊 */
     header > *{
       max-width:90%;
-      margin-left:auto;
+      margin-left:auto;         /* 內容往右貼齊 */
     }
 
     h1{
@@ -49,14 +48,14 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    /* 題目區同樣在畫面右半部，寬度最多 50vw，內部元素往右對齊 */
+    /* ✅ 題目區在畫面右半部，但內容在這個區塊內置中，整體比上一版稍微往左回來 */
     main{
       width: min(50vw, var(--w));
       margin:10px 0 60px auto;   /* 靠右 */
       padding:16px;
       display:flex;
       flex-direction:column;
-      align-items:flex-end;       /* 內部元素往右靠 */
+      align-items:center;        /* 內容在 main 內置中 */
     }
 
     .card{
@@ -66,10 +65,11 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      /* ✅ 題目底部黑色背景只用 main 寬度的 90%，大約是整個畫面右半部 */
+      /* ✅ 題目黑底只占 main 寬度的 90%（約一半畫面寬） */
       width:90%;
     }
 
+    /* 這裡只剩進度需要的樣式，分數與計時已移除 */
     .meta{
       display:flex;
       flex-wrap:wrap;
@@ -157,7 +157,6 @@
       color:#cbd5e1;
       font-size:12px;
     }
-    /* footer 內文也縮到 90%，對齊題目區 */
     footer > *{
       max-width:90%;
       margin-left:auto;
@@ -173,7 +172,7 @@
       border-radius:12px;
     }
 
-    /* 📱 小螢幕：改為置中 + 全寬，避免太窄不好讀 */
+    /* 📱 小螢幕：改為置中 + 全寬 */
     @media (max-width: 640px){
       header, main, footer{
         width: var(--w);
@@ -205,11 +204,9 @@
   </header>
 
   <main>
-    <!-- 上方 HUD：進度 / 得分 / 計時 -->
+    <!-- ✅ 只留下進度，不顯示得分 / 計時 -->
     <div class="meta card" id="hud">
       <span id="progress" class="pill">第 1/6 題</span>
-      <span id="score" class="pill">得分：0</span>
-      <span id="timer" class="pill">00:00</span>
     </div>
 
     <!-- 題目區 -->
@@ -223,7 +220,7 @@
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
-    <!-- 交卷後成績顯示（結果區本身在 .result 裡） -->
+    <!-- 交卷後成績顯示 -->
     <div id="summary"></div>
   </main>
 
@@ -237,14 +234,14 @@
 
 <script>
 /********************
- * 1) 題庫（示範：6 題）
+ * 1) 題庫
  ********************/
 const QUESTIONS = [
   {
-    q:'GitHub Pages 主要用途是？',
-    options:['部署靜態網站','當資料庫用','寄發電子報','執行雲端函式'],
-    answer:0,
-    explain:'Pages 會把 HTML/CSS/JS 公開成網站。'
+    q:'Snap-on 成立於哪一年？',
+    options:['1910 年','1920 年','1930 年','1940 年'],
+    answer:1,  // ✅ 正確答案：1920 年
+    explain:'Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟百年專業工具旅程。'
   },
   {
     q:'下列何者不是 Git 基本動作？',
@@ -297,8 +294,6 @@ const POINTS_PER_Q = 1; // 每題配分
 const $  = (s)=>document.querySelector(s);
 const quizEl     = $('#quiz');
 const progressEl = $('#progress');
-const scoreEl    = $('#score');
-const timerEl    = $('#timer');
 const prevBtn    = $('#prev');
 const nextBtn    = $('#next');
 const finishBtn  = $('#finish');
@@ -316,9 +311,8 @@ function formatTime(sec){
 function render(){
   const total = QUESTIONS.length;
 
-  // 更新 HUD
+  // 更新進度
   progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
-  scoreEl.textContent    = `得分：${state.score}`;
   prevBtn.disabled       = state.idx === 0;
   nextBtn.style.display  = state.idx < total-1 ? 'inline-block' : 'none';
   finishBtn.style.display= state.idx === total-1 ? 'inline-block' : 'none';
@@ -404,13 +398,6 @@ nextBtn.addEventListener('click', () => {
 });
 
 finishBtn.addEventListener('click', grade);
-
-// 計時器
-setInterval(() => {
-  if (state.finished) return;
-  const sec = (Date.now() - state.startAt) / 1000;
-  timerEl.textContent = formatTime(sec);
-}, 1000);
 
 // 初次畫面
 render();
