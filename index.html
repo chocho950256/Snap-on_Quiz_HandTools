@@ -6,15 +6,18 @@
   <title>Snap-on 小小知識王</title>
 
   <style>
-    :root{ --w: min(920px, 94vw); }
+    :root{
+      --w: min(920px, 94vw);
+    }
+
     html, body { height: 100%; }
 
     body{
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* ✅ 背景圖改為 assets/01.png，並縮小到 90% */
-      background: #0f172a url('assets/01.png') center/90% no-repeat fixed;
+      /* ✅ 背景圖縮小再 10%，並向下移 10%（center 60% / 80%） */
+      background: #0f172a url('assets/01.png') center 60% / 80% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
     body::before{
@@ -25,12 +28,20 @@
       z-index:-1;
     }
 
-    /* ✅ 標題、題目容器放在右半邊（靠右對齊） */
+    /* === 右半部版面設定 === */
+
+    /* 整個標題區放在畫面右半部，寬度最多 50vw */
     header{
-      max-width:var(--w);
-      margin:30px 4vw 10px auto;   /* top right bottom left */
+      width: min(50vw, var(--w));
+      margin:30px 0 10px auto;  /* top right bottom left, 靠右 */
       padding:0 8px;
     }
+    /* ✅ 讓標題文字本身只佔 header 的 90%，並靠右貼齊 */
+    header > *{
+      max-width:90%;
+      margin-left:auto;
+    }
+
     h1{
       margin:0;
       font-size: clamp(24px, 5vw, 38px);
@@ -38,10 +49,14 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
+    /* 題目區同樣在畫面右半部，寬度最多 50vw，內部元素往右對齊 */
     main{
-      max-width:var(--w);
-      margin:10px 4vw 60px auto;   /* 靠右 */
+      width: min(50vw, var(--w));
+      margin:10px 0 60px auto;   /* 靠右 */
       padding:16px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;       /* 內部元素往右靠 */
     }
 
     .card{
@@ -51,6 +66,8 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
+      /* ✅ 題目底部黑色背景只用 main 寬度的 90%，大約是整個畫面右半部 */
+      width:90%;
     }
 
     .meta{
@@ -104,6 +121,7 @@
       align-items:center;
       gap:12px;
       margin-top:14px;
+      width:90%;           /* 跟 card 寬度一致 */
     }
     .btn{
       background:#2563eb;
@@ -126,16 +144,23 @@
       background:#052e16;
       border:1px solid #14532d;
       color:#bbf7d0;
+      width:90%;           /* 成績區也對齊右半部黑底 */
+      margin-top:16px;
     }
 
     .small{ font-size:12px; color:#94a3b8; }
 
     footer{
-      max-width:var(--w);
-      margin:0 4vw 30px auto;      /* 靠右 */
+      width: min(50vw, var(--w));
+      margin:0 0 30px auto;      /* 靠右 */
       padding:0 8px;
       color:#cbd5e1;
       font-size:12px;
+    }
+    /* footer 內文也縮到 90%，對齊題目區 */
+    footer > *{
+      max-width:90%;
+      margin-left:auto;
     }
 
     .corner-gif{
@@ -148,12 +173,24 @@
       border-radius:12px;
     }
 
-    /* 小螢幕的時候，可視需要讓內容置中
-       如果你希望手機也維持靠右，可以把下面 @media 整段刪掉 */
+    /* 📱 小螢幕：改為置中 + 全寬，避免太窄不好讀 */
     @media (max-width: 640px){
       header, main, footer{
+        width: var(--w);
         margin-left:auto;
         margin-right:auto;
+      }
+      header > *, footer > *{
+        max-width:100%;
+        margin-left:0;
+      }
+      main{
+        align-items:stretch;
+      }
+      .card,
+      .controls,
+      .result{
+        width:100%;
       }
     }
   </style>
@@ -186,8 +223,8 @@
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
-    <!-- 交卷後成績顯示 -->
-    <div id="summary" style="margin-top:16px"></div>
+    <!-- 交卷後成績顯示（結果區本身在 .result 裡） -->
+    <div id="summary"></div>
   </main>
 
   <footer>
