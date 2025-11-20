@@ -1,460 +1,362 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index e5b4b74c064ab62c17925d52c22c4f1781f2dab6..f0cd34c6d61aca8e13d1133b1c3ebad3c8613dad 100644
---- a/index.html
-+++ b/index.html
-@@ -1,237 +1,222 @@
--<!DOCTYPE html>
-+<!doctype html>
- <html lang="zh-Hant">
- <head>
--  <meta charset="UTF-8" />
--  <title>Snap-on 知識挑戰賽 - Hand Tools</title>
--  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
--
-+  <meta charset="utf-8" />
-+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-+  <title>Snap-on 小小知識王</title>
-   <style>
--    *,
--    *::before,
--    *::after {
--      box-sizing: border-box;
--    }
--
--    html,
--    body {
--      margin: 0;
--      padding: 0;
--      height: 100%;
--      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC",
--        "Microsoft JhengHei", sans-serif;
--    }
--
--    body {
--      background-color: #000;
--    }
--
--    /* 三個畫面通用設定 */
--    #app {
--      width: 100%;
--      height: 100%;
--    }
--
--    .screen {
--      position: fixed;
--      inset: 0;
--      display: none;
--      background-size: cover;
--      background-position: center center;
--      background-repeat: no-repeat;
--    }
--
--    .screen.active {
--      display: block;
--    }
--
--    /* 封面背景 → assets/P1.jpg */
--    .screen-intro {
--      background-image: url("assets/P1.jpg");
--    }
--
--    /* 題目背景 → assets/P2.jpg */
--    .screen-question {
--      background-image: url("assets/P2.jpg");
--    }
--
--    /* 解答背景 → assets/P3.jpg */
--    .screen-answer {
--      background-image: url("assets/P3.jpg");
--    }
--
--    /* 共用主按鈕（封面「開始挑戰」、解答「再玩一次」） */
--    .primary-btn {
--      position: absolute;
--      left: 50%;
--      bottom: 7%;
--      transform: translateX(-50%);
--      padding: 14px 32px;
--      border-radius: 999px;
--      border: none;
--      font-size: 20px;
--      font-weight: 600;
--      cursor: pointer;
--      background-color: #f5e1c5;
--      color: #5a2514;
--      letter-spacing: 0.08em;
--      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
--      transition: transform 0.15s ease, box-shadow 0.15s ease,
--        opacity 0.15s ease;
--      opacity: 0.96;
--    }
--
--    .primary-btn:hover {
--      transform: translateX(-50%) translateY(-2px);
--      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
--    }
--
--    .primary-btn:active {
--      transform: translateX(-50%) translateY(1px);
--      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
--    }
--
--    /* 題目畫面的透明點擊區 */
--    .screen-question {
--      position: fixed;
--    }
--
--    /* 四個 hitbox 共用樣式 */
--    .answer-hitbox {
--      position: absolute;
--      /* 控制 hitbox 的左右邊界（整體在右半部） */
--      left: 55%;
--      right: 8%;
--      height: 9%;
--      /* 使用 CSS 變數 --row 來計算 top 位置 */
--      top: calc(28% + (var(--row) - 1) * 13%);
--      background-color: rgba(255, 255, 255, 0); /* 完全透明 */
--      border: none;
--      cursor: pointer;
--    }
--
--    /* 開發時想看範圍，可以暫時打開這段：
--    .answer-hitbox {
--      background-color: rgba(255, 255, 255, 0.1);
--      border: 1px dashed rgba(0, 0, 0, 0.3);
--    }
--    */
--
--    /* 答錯提示文字 */
--    .feedback {
--      position: absolute;
--      left: 50%;
--      bottom: 10%;
--      transform: translateX(-50%);
--      padding: 8px 18px;
--      border-radius: 999px;
--      background: rgba(0, 0, 0, 0.65);
--      color: #fffaf0;
--      font-size: 16px;
--      letter-spacing: 0.1em;
--      opacity: 0;
--      pointer-events: none;
--      transition: opacity 0.2s ease;
--    }
--
--    .feedback.show {
--      opacity: 1;
--    }
--  </style>
-+    :root{ --w: min(920px, 94vw); }
-+    html, body { height: 100%; }
-+    body{
-+      margin:0; font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
-+      color:#e5e7eb;
-+      background: #0f172a url('assets/01.png') center/cover no-repeat fixed;
-+    }
-+    /* 背景遮罩，讓文字更清楚 */
-+    body::before{ content:""; position:fixed; inset:0; background: rgba(0,0,0,.45); z-index:-1; }
-+
-+    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
-+    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
-+    p.sub{ margin:6px 0 0; color:#cbd5e1; }
-+
-+    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
-+
-+    .card{ background:#0b1220cc; border:1px solid #1f2937; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 10px 30px rgba(0,0,0,.25); }
-+    .meta{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#cbd5e1; font-size:14px; }
-+    .pill{ background:#111827cc; padding:6px 12px; border-radius:999px; border:1px solid #334155; }
-+
-+    .q{ font-weight:800; font-size:20px; margin:6px 0 12px; }
-+    .choices{ display:grid; grid-template-columns:1fr; gap:12px; }
-+    .choices button{ text-align:left; border:1px solid #334155; background:#0f172a; color:#e5e7eb; padding:12px 14px; border-radius:12px; cursor:pointer; transition: transform .02s ease-in, border-color .15s ease; }
-+    .choices button:hover{ transform: translateY(-1px); border-color:#60a5fa; }
-+    .choices button.selected{ border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) inset; }
-+
-+    .controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; }
-+    .btn{ background:#2563eb; color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
-+    .btn.ghost{ background:transparent; border:1px solid #334155; color:#e5e7eb; }
-+
-+    .result{ padding:16px; border-radius:12px; background:#052e16; border:1px solid #14532d; color:#bbf7d0; }
-+    .small{ font-size:12px; color:#94a3b8; }
-+
-+    footer{ max-width:var(--w); margin: 0 auto 30px; padding:0 8px; color:#cbd5e1; font-size:12px; }
-+    .corner-gif{ position:fixed; top:12px; left:12px; width:96px; z-index:10; pointer-events:none; border-radius:12px; }
-+</style>
- </head>
--
- <body>
--  <div id="app">
--    <!-- 封面畫面：使用 P1 -->
--    <section id="introScreen" class="screen screen-intro active">
--      <button id="startButton" class="primary-btn">開始挑戰</button>
--    </section>
--
--    <!-- 題目畫面：使用 P2 -->
--    <section id="questionScreen" class="screen screen-question">
--      <!-- 四個透明的點擊區，對應 1910 / 1920 / 1930 / 1940 -->
--      <button class="answer-hitbox" data-option="1910" style="--row: 1"></button>
--      <button
--        class="answer-hitbox"
--        data-option="1920"
--        data-correct="true"
--        style="--row: 2"
--      ></button>
--      <button class="answer-hitbox" data-option="1930" style="--row: 3"></button>
--      <button class="answer-hitbox" data-option="1940" style="--row: 4"></button>
--
--      <div id="feedback" class="feedback">再想想看～</div>
--    </section>
--
--    <!-- 解答畫面：使用 P3 -->
--    <section id="answerScreen" class="screen screen-answer">
--      <button id="restartButton" class="primary-btn">再玩一次</button>
--    </section>
--  </div>
--
--  <script>
--    document.addEventListener("DOMContentLoaded", () => {
--      const introScreen = document.getElementById("introScreen");
--      const questionScreen = document.getElementById("questionScreen");
--      const answerScreen = document.getElementById("answerScreen");
--
--      const startButton = document.getElementById("startButton");
--      const restartButton = document.getElementById("restartButton");
--      const feedback = document.getElementById("feedback");
--
--      const answerButtons = document.querySelectorAll(".answer-hitbox");
--      const CORRECT_OPTION = "1920"; // 正確答案年份
--
--      function showScreen(target) {
--        [introScreen, questionScreen, answerScreen].forEach((screen) => {
--          screen.classList.remove("active");
--        });
--
--        switch (target) {
--          case "intro":
--            introScreen.classList.add("active");
--            break;
--          case "question":
--            questionScreen.classList.add("active");
--            break;
--          case "answer":
--            answerScreen.classList.add("active");
--            break;
--        }
--      }
--
--      // 開始挑戰 → 題目畫面
--      startButton.addEventListener("click", () => {
--        showScreen("question");
--      });
--
--      // 再玩一次 → 回到封面
--      restartButton.addEventListener("click", () => {
--        showScreen("intro");
--      });
--
--      // 點選答案
--      answerButtons.forEach((btn) => {
--        btn.addEventListener("click", () => {
--          const option = btn.dataset.option;
--
--          if (option === CORRECT_OPTION) {
--            // 答對 → 顯示解答畫面
--            showScreen("answer");
--          } else {
--            // 答錯 → 顯示提示
--            showFeedback();
--          }
--        });
--      });
--
--      function showFeedback() {
--        if (!feedback) return;
--        feedback.classList.add("show");
--        setTimeout(() => {
--          feedback.classList.remove("show");
--        }, 1200);
--      }
-+  <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
-+  <header>
-+    <h1>Snap-on 小小知識王</h1>
-+    <p class="sub">測試看看你對Snap-on工具的了解程度</p>
-+  </header>
-+
-+  <main>
-+    <div class="meta card" id="hud">
-+      <span id="progress" class="pill">第 1/6 題</span>
-+      <span id="score" class="pill">得分：0</span>
-+      <span id="timer" class="pill">00:00</span>
-+    </div>
-+
-+    <div id="quiz"></div>
-+
-+    <div class="controls">
-+      <button id="prev" class="btn ghost" disabled>上一題</button>
-+      <div style="flex:1"></div>
-+      <button id="next" class="btn">下一題</button>
-+      <button id="finish" class="btn" style="display:none">交卷</button>
-+    </div>
-+
-+    <div id="summary" style="margin-top:16px"></div>
-+  </main>
-+
-+  <footer>
-+    <p class="small">自訂：在 <code>const QUESTIONS = [...]</code> 改題庫；背景圖可改為 <code>assets/01.png</code> 或其他自訂素材。</p>
-+  </footer>
-+
-+<script>
-+/********************
-+ * 1) 題庫（四選項 × 6 題）
-+ ********************/
-+const QUESTIONS = [
-+  { q:'GitHub Pages 主要用途是？', options:['部署靜態網站','當資料庫用','寄發電子報','執行雲端函式'], answer:0, explain:'Pages 會把 HTML/CSS/JS 公開成網站。' },
-+  { q:'下列何者不是 Git 基本動作？', options:['commit','push','pull','compile'], answer:3, explain:'compile 是編譯，Git 動作不是它。' },
-+  { q:'建立新分支常用指令？', options:['git branch 新分支名','git make branch','git split','git new'], answer:0, explain:'git branch feature-x。' },
-+  { q:'README.md 通常使用哪種語法？', options:['Markdown','LaTeX','CSV','SQL'], answer:0, explain:'README 預設採 Markdown。' },
-+  { q:'想把程式變更上傳到遠端，需使用？', options:['git push','git add remote','git upload','git send'], answer:0, explain:'本地 commit 後用 git push。' },
-+  { q:'Issues 適合用來？', options:['追蹤問題/需求','佈署靜態網站','儲存二進位檔','執行排程器'], answer:0, explain:'Issues=協作追蹤問題/任務。' },
-+];
-+
-+/********************
-+ * 2) 狀態與設定
-+ ********************/
-+let state = {
-+  idx: 0,
-+  score: 0,
-+  selected: {}, // 單選：number
-+  startAt: Date.now(),
-+  finished: false,
-+};
-+const POINTS_PER_Q = 1; // 每題配分
-+
-+/********************
-+ * 3) 工具函式
-+ ********************/
-+const $ = (s)=>document.querySelector(s);
-+const quizEl = $('#quiz');
-+const progressEl = $('#progress');
-+const scoreEl = $('#score');
-+const timerEl = $('#timer');
-+const prevBtn = $('#prev');
-+const nextBtn = $('#next');
-+const finishBtn = $('#finish');
-+const summaryEl = $('#summary');
-+
-+function formatTime(sec){
-+  const m = Math.floor(sec/60).toString().padStart(2,'0');
-+  const s = Math.floor(sec%60).toString().padStart(2,'0');
-+  return `${m}:${s}`;
-+}
-+
-+function render(){
-+  const total = QUESTIONS.length;
-+  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
-+  scoreEl.textContent = `得分：${state.score}`;
-+  prevBtn.disabled = state.idx === 0;
-+  nextBtn.style.display = state.idx < total-1 ? 'inline-block' : 'none';
-+  finishBtn.style.display = state.idx === total-1 ? 'inline-block' : 'none';
-+
-+  const q = QUESTIONS[state.idx];
-+  quizEl.innerHTML = '';
-+
-+  const card = document.createElement('div');
-+  card.className = 'card';
-+
-+  const qEl = document.createElement('div');
-+  qEl.className = 'q';
-+  qEl.textContent = q.q;
-+  card.appendChild(qEl);
-+
-+  const choices = document.createElement('div');
-+  choices.className = 'choices';
-+
-+  q.options.forEach((opt, i)=>{
-+    const btn = document.createElement('button');
-+    btn.textContent = `${'ABCD'[i]}. ${opt}`;
-+
-+    const sel = state.selected[state.idx];
-+    if(sel === i) btn.classList.add('selected');
-+
-+    btn.addEventListener('click', ()=>{
-+      state.selected[state.idx] = i;
-+      render();
-+    });
-+
-+    choices.appendChild(btn);
-+  });
-+
-+  card.appendChild(choices);
-+  quizEl.appendChild(card);
-+}
-+
-+function grade(){
-+  let score = 0;
-+  const details = [];
-+  QUESTIONS.forEach((q, i)=>{
-+    const sel = state.selected[i];
-+    const correct = sel === q.answer;
-+    if(correct) score += POINTS_PER_Q;
-+    details.push({
-+      q: q.q,
-+      selected: typeof sel === 'number' ? `${'ABCD'[sel]}. ${q.options[sel]}` : '(未作答)',
-+      answer: `${'ABCD'[q.answer]}. ${q.options[q.answer]}`,
-+      correct,
-+      explain: q.explain || ''
-     });
--  </script>
-+  });
-+  state.score = score;
-+  state.finished = true;
-+
-+  const maxScore = QUESTIONS.length * POINTS_PER_Q;
-+  const percent = Math.round(score / maxScore * 100);
-+  const used = Math.round((Date.now()-state.startAt)/1000);
-+
-+  // 成績摘要
-+  summaryEl.innerHTML = `
-+    <div class="result">
-+      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）&nbsp;&nbsp;|&nbsp;&nbsp;<strong>花費時間</strong>：${formatTime(used)}
-+    </div>
-+
-+    <div style="margin-top:10px">
-+      ${details.map((d,idx)=>`
-+        <div class="card" style="background:#0a1a2fcc">
-+          <div class="q">第 ${idx+1} 題：${d.q}</div>
-+          <div>${d.correct ? '✅ 正確' : '❌ 錯誤'}</div>
-+          <div style="margin-top:6px">你的答案：${d.selected}</div>
-+          <div>正確答案：${d.answer}</div>
-+          ${d.explain ? `<div style="margin-top:6px; color:#a7f3d0">解析：${d.explain}</div>`:''}
-+        </div>
-+      `).join('')}
-+    </div>
-+  `;
-+
-+  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-+}
-+
-+/********************
-+ * 4) 事件與初始化
-+ ********************/
-+prevBtn.addEventListener('click', ()=>{ if(state.idx>0){ state.idx--; render(); }});
-+nextBtn.addEventListener('click', ()=>{ if(state.idx<QUESTIONS.length-1){ state.idx++; render(); }});
-+finishBtn.addEventListener('click', grade);
-+
-+// 計時器
-+setInterval(()=>{
-+  if(state.finished) return;
-+  const sec = (Date.now()-state.startAt)/1000;
-+  timerEl.textContent = formatTime(sec);
-+}, 1000);
-+
-+// 初次繪製
-+render();
-+</script>
- </body>
- </html>
- 
-EOF
-)
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Snap-on 小小知識王</title>
+
+  <style>
+    :root{ --w: min(920px, 94vw); }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
+      color:#e5e7eb;
+      /* ✅ 背景圖改為 assets/01.png */
+      background: #0f172a url('assets/01.png') center/cover no-repeat fixed;
+    }
+    /* 背景遮罩，讓文字更清楚 */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.45);
+      z-index:-1;
+    }
+
+    header{ max-width:var(--w); margin:30px auto 10px; padding:0 8px; }
+    h1{ margin:0; font-size: clamp(24px, 5vw, 38px); letter-spacing:.5px; }
+    p.sub{ margin:6px 0 0; color:#cbd5e1; }
+
+    main{ max-width:var(--w); margin: 10px auto 60px; padding:16px; }
+
+    .card{
+      background:#0b1220cc;
+      border:1px solid #1f2937;
+      border-radius:18px;
+      padding:18px;
+      margin:14px 0;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      color:#cbd5e1;
+      font-size:14px;
+    }
+    .pill{
+      background:#111827cc;
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid #334155;
+    }
+
+    .q{
+      font-weight:800;
+      font-size:20px;
+      margin:6px 0 12px;
+    }
+
+    .choices{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .choices button{
+      text-align:left;
+      border:1px solid #334155;
+      background:#0f172a;
+      color:#e5e7eb;
+      padding:12px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      transition: transform .02s ease-in, border-color .15s ease;
+    }
+    .choices button:hover{
+      transform: translateY(-1px);
+      border-color:#60a5fa;
+    }
+    .choices button.selected{
+      border-color:#60a5fa;
+      box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
+    }
+
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-top:14px;
+    }
+    .btn{
+      background:#2563eb;
+      color:white;
+      border:none;
+      padding:12px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.ghost{
+      background:transparent;
+      border:1px solid #334155;
+      color:#e5e7eb;
+    }
+
+    .result{
+      padding:16px;
+      border-radius:12px;
+      background:#052e16;
+      border:1px solid #14532d;
+      color:#bbf7d0;
+    }
+
+    .small{ font-size:12px; color:#94a3b8; }
+
+    footer{
+      max-width:var(--w);
+      margin: 0 auto 30px;
+      padding:0 8px;
+      color:#cbd5e1;
+      font-size:12px;
+    }
+
+    .corner-gif{
+      position:fixed;
+      top:12px;
+      left:12px;
+      width:96px;
+      z-index:10;
+      pointer-events:none;
+      border-radius:12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 左上角 GIF，可自行更換檔案 -->
+  <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
+
+  <header>
+    <h1>Snap-on 小小知識王</h1>
+    <p class="sub">測試看看你對 Snap-on 工具的了解程度</p>
+  </header>
+
+  <main>
+    <!-- 上方 HUD：進度 / 得分 / 計時 -->
+    <div class="meta card" id="hud">
+      <span id="progress" class="pill">第 1/6 題</span>
+      <span id="score" class="pill">得分：0</span>
+      <span id="timer" class="pill">00:00</span>
+    </div>
+
+    <!-- 題目區 -->
+    <div id="quiz"></div>
+
+    <!-- 下方控制按鈕 -->
+    <div class="controls">
+      <button id="prev" class="btn ghost" disabled>上一題</button>
+      <div style="flex:1"></div>
+      <button id="next" class="btn">下一題</button>
+      <button id="finish" class="btn" style="display:none">交卷</button>
+    </div>
+
+    <!-- 交卷後成績顯示 -->
+    <div id="summary" style="margin-top:16px"></div>
+  </main>
+
+  <footer>
+    <p class="small">
+      提示：題目可以在程式碼中
+      <code>const QUESTIONS = [...]</code> 自行修改；背景圖檔放在
+      <code>assets/01.png</code>。
+    </p>
+  </footer>
+
+<script>
+/********************
+ * 1) 題庫（示範：6 題）
+ *    想改題目就改這裡
+ ********************/
+const QUESTIONS = [
+  {
+    q:'GitHub Pages 主要用途是？',
+    options:['部署靜態網站','當資料庫用','寄發電子報','執行雲端函式'],
+    answer:0,
+    explain:'Pages 會把 HTML/CSS/JS 公開成網站。'
+  },
+  {
+    q:'下列何者不是 Git 基本動作？',
+    options:['commit','push','pull','compile'],
+    answer:3,
+    explain:'compile 是編譯，Git 動作不是它。'
+  },
+  {
+    q:'建立新分支常用指令？',
+    options:['git branch 新分支名','git make branch','git split','git new'],
+    answer:0,
+    explain:'例如：git branch feature-x。'
+  },
+  {
+    q:'README.md 通常使用哪種語法？',
+    options:['Markdown','LaTeX','CSV','SQL'],
+    answer:0,
+    explain:'GitHub README 預設採 Markdown。'
+  },
+  {
+    q:'想把程式變更上傳到遠端，需使用？',
+    options:['git push','git add remote','git upload','git send'],
+    answer:0,
+    explain:'本地 commit 後用 git push 上傳。'
+  },
+  {
+    q:'Issues 適合用來？',
+    options:['追蹤問題/需求','佈署靜態網站','儲存二進位檔','執行排程器'],
+    answer:0,
+    explain:'Issues 用來協作追蹤 bug / 任務。'
+  },
+];
+
+/********************
+ * 2) 狀態與設定
+ ********************/
+let state = {
+  idx: 0,
+  score: 0,
+  selected: {},  // 每題選哪一個 index
+  startAt: Date.now(),
+  finished: false,
+};
+
+const POINTS_PER_Q = 1; // 每題配分
+
+/********************
+ * 3) DOM 快捷選取 + 工具函式
+ ********************/
+const $  = (s)=>document.querySelector(s);
+const quizEl     = $('#quiz');
+const progressEl = $('#progress');
+const scoreEl    = $('#score');
+const timerEl    = $('#timer');
+const prevBtn    = $('#prev');
+const nextBtn    = $('#next');
+const finishBtn  = $('#finish');
+const summaryEl  = $('#summary');
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+/********************
+ * 4) 繪製題目畫面
+ ********************/
+function render(){
+  const total = QUESTIONS.length;
+
+  // 更新 HUD
+  progressEl.textContent = `第 ${state.idx+1}/${total} 題`;
+  scoreEl.textContent    = `得分：${state.score}`;
+  prevBtn.disabled       = state.idx === 0;
+  nextBtn.style.display  = state.idx < total-1 ? 'inline-block' : 'none';
+  finishBtn.style.display= state.idx === total-1 ? 'inline-block' : 'none';
+
+  const q = QUESTIONS[state.idx];
+  quizEl.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const qEl = document.createElement('div');
+  qEl.className = 'q';
+  qEl.textContent = q.q;
+  card.appendChild(qEl);
+
+  const choices = document.createElement('div');
+  choices.className = 'choices';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = `${'ABCD'[i]}. ${opt}`;
+
+    const sel = state.selected[state.idx];
+    if (sel === i) btn.classList.add('selected');
+
+    btn.addEventListener('click', () => {
+      state.selected[state.idx] = i;
+      render();
+    });
+
+    choices.appendChild(btn);
+  });
+
+  card.appendChild(choices);
+  quizEl.appendChild(card);
+}
+
+/********************
+ * 5) 交卷計算成績（只顯示總分數）
+ ********************/
+function grade(){
+  let score = 0;
+
+  QUESTIONS.forEach((q, i) => {
+    const sel = state.selected[i];
+    if (sel === q.answer) {
+      score += POINTS_PER_Q;
+    }
+  });
+
+  state.score    = score;
+  state.finished = true;
+
+  const maxScore = QUESTIONS.length * POINTS_PER_Q;
+  const percent  = Math.round((score / maxScore) * 100);
+  const used     = Math.round((Date.now() - state.startAt) / 1000);
+
+  // ✅ 只顯示總分數 + 作答時間
+  summaryEl.innerHTML = `
+    <div class="result">
+      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）<br>
+      <strong>作答時間</strong>：${formatTime(used)}
+    </div>
+  `;
+
+  // 捲到成績區
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+/********************
+ * 6) 事件與初始化
+ ********************/
+prevBtn.addEventListener('click', () => {
+  if (state.idx > 0) {
+    state.idx--;
+    render();
+  }
+});
+
+nextBtn.addEventListener('click', () => {
+  if (state.idx < QUESTIONS.length - 1) {
+    state.idx++;
+    render();
+  }
+});
+
+finishBtn.addEventListener('click', grade);
+
+// 計時器
+setInterval(() => {
+  if (state.finished) return;
+  const sec = (Date.now() - state.startAt) / 1000;
+  timerEl.textContent = formatTime(sec);
+}, 1000);
+
+// 初次畫面
+render();
+</script>
+</body>
+</html>
