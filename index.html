@@ -16,8 +16,8 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* 背景圖縮到 75%，並向下移 10% */
-      background: #0f172a url('assets/01.png') center 60% / 75% no-repeat fixed;
+      /* 背景圖縮到 75%，並向下再移 2% → 62% */
+      background: #0f172a url('assets/01.png') center 62% / 75% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
     body::before{
@@ -56,6 +56,7 @@
       align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
+    /* 每一題卡片寬度固定，高度自動隨內容增減 */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -64,13 +65,22 @@
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
       width:90%;          /* 題目黑底只占 main 寬度的 90% */
-      margin-right:5%;    /* ✅ 題目再往左 5%，按鈕不動 */
+      margin-right:5%;    /* 題目再往左 5%，按鈕不動 */
+      box-sizing:border-box;
     }
 
     .q{
       font-weight:800;
       font-size:20px;
       margin:6px 0 12px;
+    }
+
+    /* 第一題上方的區段標題 */
+    .section-title{
+      font-family: "MS Gothic","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+      font-size:18px;
+      color:#365F91;
+      margin-bottom:4px;
     }
 
     .choices{
@@ -104,7 +114,7 @@
       align-items:center;
       gap:12px;
       margin-top:14px;
-      width:90%;           /* 跟之前一樣，整組靠右，沒有跟著題目一起左移 */
+      width:90%;
     }
     .btn{
       background:#2563eb;
@@ -121,6 +131,11 @@
       color:#e5e7eb;
     }
 
+    /* ✅ 將「下一題」按鈕往右移 20% */
+    #next{
+      margin-left:20%;
+    }
+
     .result{
       padding:16px;
       border-radius:12px;
@@ -129,6 +144,7 @@
       color:#bbf7d0;
       width:90%;
       margin-top:16px;
+      box-sizing:border-box;
     }
 
     /* footer 還留版面設定，但內文已拿掉 */
@@ -154,7 +170,7 @@
       border-radius:12px;
     }
 
-    /* 📱 小螢幕：改為置中 + 全寬 */
+    /* 📱 小螢幕：改為置中 + 全寬，並把 Next 的位移拿掉 */
     @media (max-width: 640px){
       header{
         width: var(--w);
@@ -183,11 +199,14 @@
         width:100%;
         margin-right:0;
       }
+      #next{
+        margin-left:0;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- 左上角 GIF，可自行更換檔案 -->
+  <!-- 左上角 GIF -->
   <img class="corner-gif" src="assets/Snap Spark Sticker by Snap-on Tools.gif" alt="Snap-on spark sticker" />
 
   <header>
@@ -276,7 +295,7 @@ const QUESTIONS = [
       '瑞典',
       '日本'
     ],
-    answer:2, // 瑞典
+    answer:2,
     explain:'Bahco 起源於瑞典，是以活動扳手與鋸片聞名的專業手工具品牌。'
   },
   {
@@ -287,7 +306,7 @@ const QUESTIONS = [
       '黑色',
       '銀色'
     ],
-    answer:1, // 紅色
+    answer:1,
     explain:'鮮明的紅色工具與工具車，是許多專業修車廠中 Snap-on 最具代表性的視覺形象。'
   },
   {
@@ -298,7 +317,7 @@ const QUESTIONS = [
       '技師可在門口直接選購',
       '展示新車試駕'
     ],
-    answer:2, // 技師可在門口直接選購
+    answer:2,
     explain:'行動工具車會開到修車廠門口，讓技師直接在門口試用、選購工具，是獨特的直銷模式。'
   },
   {
@@ -309,7 +328,7 @@ const QUESTIONS = [
       '醫師',
       '飛行員'
     ],
-    answer:1, // 汽車維修技師
+    answer:1,
     explain:'在全球專業汽車維修與相關產業中，Snap-on 被視為工具標竿品牌之一。'
   },
   {
@@ -320,7 +339,7 @@ const QUESTIONS = [
       'Donald J. Trump',
       'Joe Biden'
     ],
-    answer:2, // Donald J. Trump
+    answer:2,
     explain:'2017 年 4 月，時任美國總統 Donald J. Trump 參訪 Snap-on 在 Kenosha 的總部。'
   },
 ];
@@ -367,6 +386,14 @@ function render(){
 
   const card = document.createElement('div');
   card.className = 'card';
+
+  // ✅ 第一題上方加上「1️⃣ 創業傳奇」
+  if (state.idx === 0){
+    const secTitle = document.createElement('div');
+    secTitle.className = 'section-title';
+    secTitle.textContent = '1️⃣ 創業傳奇';
+    card.appendChild(secTitle);
+  }
 
   const qEl = document.createElement('div');
   qEl.className = 'q';
