@@ -56,7 +56,7 @@
       align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
-    /* ✅ 每一題卡片寬度固定 25vw，高度依內容自動 */
+    /* 每一題卡片寬度固定 25vw，高度依內容自動 */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -130,9 +130,9 @@
       color:#e5e7eb;
     }
 
-    /* ✅ 將「下一題」按鈕向右移動 20% */
+    /* ✅ 將「下一題」按鈕向右移動 10vw */
     #next{
-      margin-left:20%;
+      margin-left:10vw;
     }
 
     .result{
@@ -163,7 +163,7 @@
       position:fixed;
       top:12px;
       left:12px;
-      width:115px;           /* 放大 20% */
+      width:126px;           /* ✅ 再放大約 10%（原 115px） */
       z-index:10;
       pointer-events:none;
       border-radius:12px;
@@ -388,7 +388,7 @@ function render(){
   const card = document.createElement('div');
   card.className = 'card';
 
-  // ✅ 第一題上方：「1️⃣ 創業傳奇」
+  // 1️⃣ 創業傳奇
   if (state.idx === 0){
     const secTitle = document.createElement('div');
     secTitle.className = 'section-title';
@@ -396,12 +396,76 @@ function render(){
     card.appendChild(secTitle);
   }
 
-  // ✅ 第二題上方：「2️⃣ 革命性的創意」
+  // 2️⃣ 革命性的創意
   if (state.idx === 1){
     const secTitle2 = document.createElement('div');
     secTitle2.className = 'section-title';
     secTitle2.textContent = '2️⃣ 革命性的創意';
     card.appendChild(secTitle2);
+  }
+
+  // 3️⃣ 專利開端
+  if (state.idx === 2){
+    const secTitle3 = document.createElement('div');
+    secTitle3.className = 'section-title';
+    secTitle3.textContent = '3️⃣ 專利開端';
+    card.appendChild(secTitle3);
+  }
+
+  // 4️⃣ 戰場上的工具英雄
+  if (state.idx === 3){
+    const secTitle4 = document.createElement('div');
+    secTitle4.className = 'section-title';
+    secTitle4.textContent = '4️⃣ 戰場上的工具英雄';
+    card.appendChild(secTitle4);
+  }
+
+  // 5️⃣ Flank Drive® 的魔力
+  if (state.idx === 4){
+    const secTitle5 = document.createElement('div');
+    secTitle5.className = 'section-title';
+    secTitle5.textContent = '5️⃣ Flank Drive® 的魔力';
+    card.appendChild(secTitle5);
+  }
+
+  // 6️⃣ 百年傳承的歐洲血統
+  if (state.idx === 5){
+    const secTitle6 = document.createElement('div');
+    secTitle6.className = 'section-title';
+    secTitle6.textContent = '6️⃣ 百年傳承的歐洲血統';
+    card.appendChild(secTitle6);
+  }
+
+  // 7️⃣ 紅色工具車的傳奇
+  if (state.idx === 6){
+    const secTitle7 = document.createElement('div');
+    secTitle7.className = 'section-title';
+    secTitle7.textContent = '7️⃣ 紅色工具車的傳奇';
+    card.appendChild(secTitle7);
+  }
+
+  // 8️⃣ 移動的展示間
+  if (state.idx === 7){
+    const secTitle8 = document.createElement('div');
+    secTitle8.className = 'section-title';
+    secTitle8.textContent = '8️⃣ 移動的展示間';
+    card.appendChild(secTitle8);
+  }
+
+  // 9️⃣ 精準的代名詞
+  if (state.idx === 8){
+    const secTitle9 = document.createElement('div');
+    secTitle9.className = 'section-title';
+    secTitle9.textContent = '9️⃣ 精準的代名詞';
+    card.appendChild(secTitle9);
+  }
+
+  // 🔟 總統造訪 Snap-on
+  if (state.idx === 9){
+    const secTitle10 = document.createElement('div');
+    secTitle10.className = 'section-title';
+    secTitle10.textContent = '🔟 總統造訪 Snap-on';
+    card.appendChild(secTitle10);
   }
 
   const qEl = document.createElement('div');
