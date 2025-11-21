@@ -46,10 +46,10 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    /* === 題目區：寬度與 header 一致，但整塊往左 20% === */
+    /* === 題目區：寬度與 header 一致，整組在標題下方靠右 === */
     main{
       width: min(45vw, var(--w));
-      margin:10px 20vw 60px auto;   /* 右邊留 20vw → 整組往左移 */
+      margin:10px 20vw 60px auto;   /* 和前一版相同，維持按鈕所在整體位置 */
       padding:16px;
       display:flex;
       flex-direction:column;
@@ -63,7 +63,8 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      width:90%;   /* 題目黑底只占 main 寬度的 90% */
+      width:90%;          /* 題目黑底只占 main 寬度的 90% */
+      margin-right:5%;    /* ✅ 題目再往左 5%，按鈕不動 */
     }
 
     .q{
@@ -96,14 +97,14 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 下一題/交卷按鈕：與題目卡片同寬、右邊界也對齊 */
+    /* 下一題/交卷按鈕：維持上一版位置（與 main 右邊對齊） */
     .controls{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
       margin-top:14px;
-      width:90%;           /* 跟 .card 一樣寬，緊貼題目下方 */
+      width:90%;           /* 跟之前一樣，整組靠右，沒有跟著題目一起左移 */
     }
     .btn{
       background:#2563eb;
@@ -130,9 +131,7 @@
       margin-top:16px;
     }
 
-    .small{ font-size:12px; color:#94a3b8; }
-
-    /* footer 還留著版面設定，但不放任何文字內容 */
+    /* footer 還留版面設定，但內文已拿掉 */
     footer{
       width: min(45vw, var(--w));
       margin:0 0 30px auto;
@@ -149,7 +148,7 @@
       position:fixed;
       top:12px;
       left:12px;
-      width:115px;           /* ✅ 放大 20%（原本約 96px） */
+      width:115px;           /* 放大 20% */
       z-index:10;
       pointer-events:none;
       border-radius:12px;
@@ -182,6 +181,7 @@
       .controls,
       .result{
         width:100%;
+        margin-right:0;
       }
     }
   </style>
@@ -196,7 +196,7 @@
   </header>
 
   <main>
-    <!-- 題目區：就在下一題按鈕上方、同寬 -->
+    <!-- 題目區 -->
     <div id="quiz"></div>
 
     <!-- 下方控制按鈕（只有下一題 / 交卷） -->
@@ -210,18 +210,18 @@
     <div id="summary"></div>
   </main>
 
-  <!-- footer 保留結構但不顯示提示文字 -->
+  <!-- footer 保留結構但不顯示文字 -->
   <footer></footer>
 
 <script>
 /********************
- * 1) 題庫
+ * 1) 題庫（共 10 題）
  ********************/
 const QUESTIONS = [
   {
     q:'Snap-on 成立於哪一年？',
     options:['1910 年','1920 年','1930 年','1940 年'],
-    answer:1,  // 正確答案：1920 年
+    answer:1,
     explain:'Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟百年專業工具旅程。'
   },
   {
@@ -232,7 +232,7 @@ const QUESTIONS = [
       '速度決定一切！',
       '讓工具會思考！'
     ],
-    answer:1, // 正確答案：五個工具幹五十件活！
+    answer:1,
     explain:'最早的口號是「五個工具幹五十件活！（Five do the work of fifty!）」'
   },
   {
@@ -243,7 +243,7 @@ const QUESTIONS = [
       '第一台氣動工具',
       '第一台工具車'
     ],
-    answer:1, // 正確答案：No. 6 棘輪扳手
+    answer:1,
     explain:'Snap-on 最早取得專利的產品是 No. 6 棘輪扳手。'
   },
   {
@@ -254,7 +254,7 @@ const QUESTIONS = [
       '農業機具',
       '航空與軍用維修'
     ],
-    answer:3, // 正確答案：航空與軍用維修
+    answer:3,
     explain:'二戰期間，Snap-on 工具廣泛應用於軍用車輛與航空維修，支援軍事與航空領域。'
   },
   {
@@ -265,14 +265,63 @@ const QUESTIONS = [
       '可自動校正扭力',
       '附 LED 照明'
     ],
-    answer:0, // ✅ 正確答案：讓螺帽不再滑牙
+    answer:0,
     explain:'Flank Drive® 透過接觸螺帽側面，而非尖角，大幅降低滑牙風險並提升扭力傳遞效率。'
   },
   {
-    q:'Issues 適合用來？',
-    options:['追蹤問題/需求','佈署靜態網站','儲存二進位檔','執行排程器'],
-    answer:0,
-    explain:'Issues 用來協作追蹤 bug / 任務。'
+    q:'Snap-on 旗下的手工具品牌 Bahco 起源於哪個國家？',
+    options:[
+      '美國',
+      '德國',
+      '瑞典',
+      '日本'
+    ],
+    answer:2, // 瑞典
+    explain:'Bahco 起源於瑞典，是以活動扳手與鋸片聞名的專業手工具品牌。'
+  },
+  {
+    q:'在世界各地的專業修車廠中，哪個顏色最能代表 Snap-on？',
+    options:[
+      '藍色',
+      '紅色',
+      '黑色',
+      '銀色'
+    ],
+    answer:1, // 紅色
+    explain:'鮮明的紅色工具與工具車，是許多專業修車廠中 Snap-on 最具代表性的視覺形象。'
+  },
+  {
+    q:'Snap-on 在美國首創的「行動工具車（Tool Truck）」有何特別之處？',
+    options:[
+      '賣冰淇淋的同時賣工具',
+      '提供上門維修服務',
+      '技師可在門口直接選購',
+      '展示新車試駕'
+    ],
+    answer:2, // 技師可在門口直接選購
+    explain:'行動工具車會開到修車廠門口，讓技師直接在門口試用、選購工具，是獨特的直銷模式。'
+  },
+  {
+    q:'Snap-on 長期被視為哪一類專業人士的標準品牌？',
+    options:[
+      '建築師',
+      '汽車維修技師',
+      '醫師',
+      '飛行員'
+    ],
+    answer:1, // 汽車維修技師
+    explain:'在全球專業汽車維修與相關產業中，Snap-on 被視為工具標竿品牌之一。'
+  },
+  {
+    q:'2017 年 4 月，哪位美國總統親自造訪 Snap-on 位於威斯康辛州 Kenosha 的總部？',
+    options:[
+      'Barack Obama',
+      'George W. Bush',
+      'Donald J. Trump',
+      'Joe Biden'
+    ],
+    answer:2, // Donald J. Trump
+    explain:'2017 年 4 月，時任美國總統 Donald J. Trump 參訪 Snap-on 在 Kenosha 的總部。'
   },
 ];
 
