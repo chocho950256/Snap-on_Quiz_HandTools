@@ -49,14 +49,14 @@
     /* === 題目區：寬度與 header 一致，整組在標題下方靠右 === */
     main{
       width: min(45vw, var(--w));
-      margin:10px 20vw 60px auto;   /* 保持整體位置不變 */
+      margin:10px 20vw 60px auto;
       padding:16px;
       display:flex;
       flex-direction:column;
       align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
-    /* 每一題卡片寬度固定 25vw，高度依內容自動 */
+    /* 題目卡片寬度固定 25vw，高度依內容自動 */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -106,14 +106,26 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 按鈕列寬度維持原設定 */
+    /* 解析區塊（第一題用） */
+    #explain{
+      margin-top:8px;
+      align-self:flex-end;
+    }
+    .explain-card{
+      background:#111827cc;
+      border:1px solid #1f2937;
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:14px;
+      width:25vw;
+      box-sizing:border-box;
+    }
+
+    /* 控制列存在但不再負責定位按鈕 */
     .controls{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
       margin-top:14px;
       width:90%;
+      height:40px; /* 只佔位，不影響視覺 */
     }
     .btn{
       background:#2563eb;
@@ -124,15 +136,14 @@
       cursor:pointer;
       font-weight:700;
     }
-    .btn.ghost{
-      background:transparent;
-      border:1px solid #334155;
-      color:#e5e7eb;
-    }
 
-    /* ✅ 將「下一題」按鈕向右移動 10vw */
-    #next{
-      margin-left:10vw;
+    /* ✅ 「下一題」和「交卷」按鈕固定位置：右側 25vw、下側 15vw */
+    #next,
+    #finish{
+      position:fixed;
+      right:25vw;
+      bottom:15vw;
+      z-index:20;
     }
 
     .result{
@@ -154,22 +165,18 @@
       color:#cbd5e1;
       font-size:12px;
     }
-    footer > *{
-      max-width:90%;
-      margin-left:auto;
-    }
 
     .corner-gif{
       position:fixed;
       top:12px;
       left:12px;
-      width:126px;           /* ✅ 再放大約 10%（原 115px） */
+      width:126px;           /* 放大後大小 */
       z-index:10;
       pointer-events:none;
       border-radius:12px;
     }
 
-    /* 📱 小螢幕：改為置中 + 全寬，並把卡片寬度與 Next 位移重設 */
+    /* 📱 小螢幕：改為置中 + 全寬，並把卡片寬度與 Next 固定位置重設 */
     @media (max-width: 640px){
       header{
         width: var(--w);
@@ -185,23 +192,25 @@
         margin-left:auto;
         margin-right:auto;
       }
-      footer > *{
-        max-width:100%;
-        margin-left:0;
-      }
+
       main{
         align-items:stretch;
       }
       .card,
-      .controls,
       .result{
         width:100%;
       }
-      .card{
+      .explain-card{
         width:100%;
       }
-      #next{
-        margin-left:0;
+
+      #next,
+      #finish{
+        position:static;
+        margin-top:8px;
+      }
+      .controls{
+        height:auto;
       }
     }
   </style>
@@ -219,10 +228,12 @@
     <!-- 題目區 -->
     <div id="quiz"></div>
 
-    <!-- 下方控制按鈕（只有下一題 / 交卷） -->
+    <!-- 第一題解析顯示區 -->
+    <div id="explain"></div>
+
+    <!-- 控制列（只負責結構） -->
     <div class="controls">
       <button id="next" class="btn">下一題</button>
-      <div style="flex:1"></div>
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
@@ -351,9 +362,10 @@ const QUESTIONS = [
 let state = {
   idx: 0,
   score: 0,
-  selected: {},  // 每題選哪一個 index
+  selected: {},        // 每題選哪一個 index
   startAt: Date.now(),
   finished: false,
+  firstExplainShown: false, // ✅ 第一題解析是否已顯示
 };
 
 const POINTS_PER_Q = 1; // 每題配分
@@ -363,6 +375,7 @@ const POINTS_PER_Q = 1; // 每題配分
  ********************/
 const $  = (s)=>document.querySelector(s);
 const quizEl     = $('#quiz');
+const explainEl  = $('#explain');
 const nextBtn    = $('#next');
 const finishBtn  = $('#finish');
 const summaryEl  = $('#summary');
@@ -384,6 +397,7 @@ function render(){
 
   const q = QUESTIONS[state.idx];
   quizEl.innerHTML = '';
+  explainEl.innerHTML = '';   // 換題時清除解析區塊
 
   const card = document.createElement('div');
   card.className = 'card';
@@ -496,7 +510,18 @@ function render(){
 }
 
 /********************
- * 5) 交卷計算成績（只顯示總分數）
+ * 5) 第一題專用解析顯示
+ ********************/
+function showFirstExplain(){
+  explainEl.innerHTML = `
+    <div class="explain-card">
+      解析：Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟了百年專業工具的傳奇旅程。
+    </div>
+  `;
+}
+
+/********************
+ * 6) 交卷計算成績（只顯示總分數）
  ********************/
 function grade(){
   let score = 0;
@@ -526,10 +551,25 @@ function grade(){
 }
 
 /********************
- * 6) 事件與初始化
+ * 7) 事件與初始化
  ********************/
 nextBtn.addEventListener('click', () => {
-  if (state.idx < QUESTIONS.length - 1) {
+  const total = QUESTIONS.length;
+
+  // ✅ 第一題：先顯示解析，再進入第二題
+  if (state.idx === 0 && !state.firstExplainShown){
+    // 沒選答案就不給按
+    if (typeof state.selected[0] !== 'number'){
+      alert('請先選擇一個答案喔！');
+      return;
+    }
+    state.firstExplainShown = true;
+    showFirstExplain();
+    return; // 不換題
+  }
+
+  // 其他情況正常換下一題
+  if (state.idx < total - 1) {
     state.idx++;
     render();
   }
