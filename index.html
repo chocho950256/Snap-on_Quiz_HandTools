@@ -46,14 +46,14 @@
     }
     p.sub{ margin:6px 0 0; color:#cbd5e1; }
 
-    /* === 題目區：寬度與 header 一致，整組在標題正下方靠右 === */
+    /* === 題目區：寬度與 header 一致，但整塊往左 20% === */
     main{
       width: min(45vw, var(--w));
-      margin:10px 0 60px auto;   /* 和 header 一樣靠右 */
+      margin:10px 20vw 60px auto;   /* 右邊留 20vw → 整組往左移 */
       padding:16px;
       display:flex;
       flex-direction:column;
-      align-items:flex-end;      /* 內容向右對齊，對齊標題 */
+      align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
     .card{
@@ -132,6 +132,7 @@
 
     .small{ font-size:12px; color:#94a3b8; }
 
+    /* footer 還留著版面設定，但不放任何文字內容 */
     footer{
       width: min(45vw, var(--w));
       margin:0 0 30px auto;
@@ -148,7 +149,7 @@
       position:fixed;
       top:12px;
       left:12px;
-      width:96px;
+      width:115px;           /* ✅ 放大 20%（原本約 96px） */
       z-index:10;
       pointer-events:none;
       border-radius:12px;
@@ -209,13 +210,8 @@
     <div id="summary"></div>
   </main>
 
-  <footer>
-    <p class="small">
-      提示：題目可以在程式碼中
-      <code>const QUESTIONS = [...]</code> 自行修改；背景圖檔放在
-      <code>assets/01.png</code>。
-    </p>
-  </footer>
+  <!-- footer 保留結構但不顯示提示文字 -->
+  <footer></footer>
 
 <script>
 /********************
@@ -258,14 +254,19 @@ const QUESTIONS = [
       '農業機具',
       '航空與軍用維修'
     ],
-    answer:3, // ✅ 正確答案：航空與軍用維修
+    answer:3, // 正確答案：航空與軍用維修
     explain:'二戰期間，Snap-on 工具廣泛應用於軍用車輛與航空維修，支援軍事與航空領域。'
   },
   {
-    q:'想把程式變更上傳到遠端，需使用？',
-    options:['git push','git add remote','git upload','git send'],
-    answer:0,
-    explain:'本地 commit 後用 git push 上傳。'
+    q:'Snap-on 最具代表性的 Flank Drive® 技術有什麼特點？',
+    options:[
+      '讓螺帽不再滑牙',
+      '超輕量設計',
+      '可自動校正扭力',
+      '附 LED 照明'
+    ],
+    answer:0, // ✅ 正確答案：讓螺帽不再滑牙
+    explain:'Flank Drive® 透過接觸螺帽側面，而非尖角，大幅降低滑牙風險並提升扭力傳遞效率。'
   },
   {
     q:'Issues 適合用來？',
