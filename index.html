@@ -19,8 +19,6 @@
       background: #0f172a url('assets/01.png') center 62% / 75% no-repeat fixed;
     }
 
-    /* ✅ 已移除背景遮罩（原本的 body::before） */
-
     header{
       width: min(45vw, var(--w));
       margin:60px 0 10px auto;
@@ -31,12 +29,19 @@
       margin-left:auto;
     }
 
+    /* ✅ 標題改成黑色 */
     h1{
       margin:0;
       font-size: clamp(24px, 5vw, 38px);
       letter-spacing:.5px;
+      color:#000000;
     }
-    p.sub{ margin:6px 0 0; color:#cbd5e1; }
+
+    /* ✅ 副標題改成黑色 */
+    p.sub{
+      margin:6px 0 0;
+      color:#000000;
+    }
 
     main{
       width: min(45vw, var(--w));
@@ -47,7 +52,7 @@
       align-items:flex-end;
     }
 
-    /* ✅ 題目卡片寬度固定 28vw */
+    /* 題目卡片寬度固定 28vw */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -65,10 +70,11 @@
       margin:6px 0 12px;
     }
 
+    /* ✅ 題目前的敘述改成紅色 #913533 */
     .section-title{
       font-size:18px;
       font-weight:800;
-      color:#365F91;
+      color:#913533;
       margin-bottom:4px;
     }
 
@@ -88,10 +94,10 @@
       transition: transform .02s ease-in, border-color .15s ease, box-shadow .15s ease;
     }
 
-    /* ✅ 滑鼠移上/點選改用紅色框 */
+    /* 滑鼠移上/點選改用紅色框 */
     .choices button:hover{
       transform: translateY(-1px);
-      border-color:#ef4444; /* 紅色 */
+      border-color:#ef4444;
     }
     .choices button.selected{
       border-color:#ef4444;
@@ -102,7 +108,7 @@
       margin-top:8px;
       align-self:flex-end;
     }
-    /* ✅ 解析區塊也維持 28vw */
+
     .explain-card{
       background:#111827cc;
       border:1px solid #1f2937;
