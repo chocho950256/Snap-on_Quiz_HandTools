@@ -16,6 +16,7 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
+      /* 預設使用第一題背景，之後用 JS 依題目覆蓋 background-image */
       background: #0f172a url('assets/01.png') center 62% / 75% no-repeat fixed;
     }
 
@@ -29,7 +30,7 @@
       margin-left:auto;
     }
 
-    /* ✅ 標題改成黑色 */
+    /* 標題改成黑色 */
     h1{
       margin:0;
       font-size: clamp(24px, 5vw, 38px);
@@ -37,7 +38,7 @@
       color:#000000;
     }
 
-    /* ✅ 副標題改成黑色 */
+    /* 副標題改成黑色 */
     p.sub{
       margin:6px 0 0;
       color:#000000;
@@ -70,7 +71,7 @@
       margin:6px 0 12px;
     }
 
-    /* ✅ 題目前的敘述改成紅色 #913533 */
+    /* 題目前的敘述改成紅色 #913533 */
     .section-title{
       font-size:18px;
       font-weight:800;
@@ -259,6 +260,9 @@
   </div>
 
 <script>
+/********************
+ * 題庫
+ ********************/
 const QUESTIONS = [
   {
     q:'Snap-on 成立於哪一年？',
@@ -366,6 +370,19 @@ const QUESTIONS = [
     explain:'💡 解析：2017 年 4 月，總統 Donald J. Trump 到訪 Snap-on 總部，並簽署「Buy American & Hire American」行政命令，象徵對美國製造與職業教育的支持。'
   },
 ];
+
+/********************
+ * 每題對應的背景圖
+ * 0=第一題, 1=第二題...
+ ********************/
+const BG_MAP = {
+  0: 'assets/01.png',
+  1: 'assets/02.png',
+  2: 'assets/03.jpeg',
+  3: 'assets/04.jpeg',
+  4: 'assets/05.jpeg'
+  // 其餘題目若沒設定，預設用 01.png
+};
 
 let state = {
   idx: 0,
@@ -486,6 +503,11 @@ function render(){
 
   card.appendChild(choices);
   quizEl.appendChild(card);
+
+  // ✅ 根據題目切換背景圖
+  const bgPath = BG_MAP[state.idx] || 'assets/01.png';
+  document.body.style.backgroundImage = `url('${bgPath}')`;
+  // 其他 background 設定（位置、大小等）維持 CSS 既有設定
 }
 
 function showExplain(idx){
@@ -604,6 +626,7 @@ finishBtn.addEventListener('click', () => {
   grade();
 });
 
+// 初次畫面
 render();
 </script>
 </body>
