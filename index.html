@@ -16,7 +16,7 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* 背景圖縮到 75%，並向下再移 2% → 62% */
+      /* 背景圖縮到 75%，並向下移 2%（原 60% → 62%） */
       background: #0f172a url('assets/01.png') center 62% / 75% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
@@ -49,14 +49,14 @@
     /* === 題目區：寬度與 header 一致，整組在標題下方靠右 === */
     main{
       width: min(45vw, var(--w));
-      margin:10px 20vw 60px auto;   /* 和前一版相同，維持按鈕所在整體位置 */
+      margin:10px 20vw 60px auto;   /* 保持整體位置不變 */
       padding:16px;
       display:flex;
       flex-direction:column;
       align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
-    /* 每一題卡片寬度固定，高度自動隨內容增減 */
+    /* ✅ 每一題卡片寬度固定 20vw，高度依內容自動 */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -64,8 +64,7 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      width:90%;          /* 題目黑底只占 main 寬度的 90% */
-      margin-right:5%;    /* 題目再往左 5%，按鈕不動 */
+      width:20vw;
       box-sizing:border-box;
     }
 
@@ -75,10 +74,10 @@
       margin:6px 0 12px;
     }
 
-    /* 第一題上方的區段標題 */
+    /* ✅ 第一題上方的區段標題：字體與題目相同，只換顏色 */
     .section-title{
-      font-family: "MS Gothic","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
       font-size:18px;
+      font-weight:800;
       color:#365F91;
       margin-bottom:4px;
     }
@@ -107,7 +106,7 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 下一題/交卷按鈕：維持上一版位置（與 main 右邊對齊） */
+    /* 按鈕列寬度維持原設定 */
     .controls{
       display:flex;
       justify-content:space-between;
@@ -131,7 +130,7 @@
       color:#e5e7eb;
     }
 
-    /* ✅ 將「下一題」按鈕往右移 20% */
+    /* ✅ 將「下一題」按鈕向右移動 20% */
     #next{
       margin-left:20%;
     }
@@ -170,7 +169,7 @@
       border-radius:12px;
     }
 
-    /* 📱 小螢幕：改為置中 + 全寬，並把 Next 的位移拿掉 */
+    /* 📱 小螢幕：改為置中 + 全寬，並把卡片寬度與 Next 位移重設 */
     @media (max-width: 640px){
       header{
         width: var(--w);
@@ -197,7 +196,9 @@
       .controls,
       .result{
         width:100%;
-        margin-right:0;
+      }
+      .card{
+        width:100%;
       }
       #next{
         margin-left:0;
