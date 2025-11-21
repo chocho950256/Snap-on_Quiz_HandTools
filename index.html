@@ -16,7 +16,7 @@
       margin:0;
       font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "微軟正黑體", sans-serif;
       color:#e5e7eb;
-      /* 背景圖縮到 75%，並向下移 2%（原 60% → 62%） */
+      /* 背景圖縮到 75%，並向下移 2%（62%） */
       background: #0f172a url('assets/01.png') center 62% / 75% no-repeat fixed;
     }
     /* 背景遮罩，讓文字更清楚 */
@@ -56,7 +56,7 @@
       align-items:flex-end;         /* 內容向右對齊，對齊標題 */
     }
 
-    /* ✅ 每一題卡片寬度固定 20vw，高度依內容自動 */
+    /* ✅ 每一題卡片寬度固定 25vw，高度依內容自動 */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -64,7 +64,7 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      width:20vw;
+      width:25vw;
       box-sizing:border-box;
     }
 
@@ -74,7 +74,7 @@
       margin:6px 0 12px;
     }
 
-    /* ✅ 第一題上方的區段標題：字體與題目相同，只換顏色 */
+    /* 區段標題：字體與題目相同，只換顏色 */
     .section-title{
       font-size:18px;
       font-weight:800;
@@ -388,12 +388,20 @@ function render(){
   const card = document.createElement('div');
   card.className = 'card';
 
-  // ✅ 第一題上方加上「1️⃣ 創業傳奇」
+  // ✅ 第一題上方：「1️⃣ 創業傳奇」
   if (state.idx === 0){
     const secTitle = document.createElement('div');
     secTitle.className = 'section-title';
     secTitle.textContent = '1️⃣ 創業傳奇';
     card.appendChild(secTitle);
+  }
+
+  // ✅ 第二題上方：「2️⃣ 革命性的創意」
+  if (state.idx === 1){
+    const secTitle2 = document.createElement('div');
+    secTitle2.className = 'section-title';
+    secTitle2.textContent = '2️⃣ 革命性的創意';
+    card.appendChild(secTitle2);
   }
 
   const qEl = document.createElement('div');
