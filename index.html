@@ -106,7 +106,7 @@
       box-shadow:0 0 0 3px rgba(96,165,250,.25) inset;
     }
 
-    /* 解析區塊（第一題用） */
+    /* 第一題解析顯示區 */
     #explain{
       margin-top:8px;
       align-self:flex-end;
@@ -121,11 +121,11 @@
       box-sizing:border-box;
     }
 
-    /* 控制列存在但不再負責定位按鈕 */
+    /* 控制列存在但不再負責定位按鈕，只佔位 */
     .controls{
       margin-top:14px;
       width:90%;
-      height:40px; /* 只佔位，不影響視覺 */
+      height:40px;
     }
     .btn{
       background:#2563eb;
@@ -137,12 +137,12 @@
       font-weight:700;
     }
 
-    /* ✅ 「下一題」和「交卷」按鈕固定位置：右側 25vw、下側 15vw */
+    /* ✅ 「下一題」和「交卷」按鈕固定位置：右側 30vw、下側 5vw */
     #next,
     #finish{
       position:fixed;
-      right:25vw;
-      bottom:15vw;
+      right:30vw;
+      bottom:5vw;
       z-index:20;
     }
 
@@ -157,7 +157,6 @@
       box-sizing:border-box;
     }
 
-    /* footer 還留版面設定，但內文已拿掉 */
     footer{
       width: min(45vw, var(--w));
       margin:0 0 30px auto;
@@ -170,7 +169,7 @@
       position:fixed;
       top:12px;
       left:12px;
-      width:126px;           /* 放大後大小 */
+      width:126px;
       z-index:10;
       pointer-events:none;
       border-radius:12px;
@@ -221,7 +220,8 @@
 
   <header>
     <h1>Snap-on 小小知識王</h1>
-    <p class="sub">測試看看你對 Snap-on 工具的了解程度</p>
+    <!-- ✅ 副標題改版 -->
+    <p class="sub">測試看看你對 Snap-on 的了解程度!</p>
   </header>
 
   <main>
@@ -241,7 +241,6 @@
     <div id="summary"></div>
   </main>
 
-  <!-- footer 保留結構但不顯示文字 -->
   <footer></footer>
 
 <script>
@@ -253,7 +252,8 @@ const QUESTIONS = [
     q:'Snap-on 成立於哪一年？',
     options:['1910 年','1920 年','1930 年','1940 年'],
     answer:1,
-    explain:'Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟百年專業工具旅程。'
+    // ✅ 第一題解析文字更新（附 💡）
+    explain:'💡 解析：Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟了百年專業工具的傳奇旅程。'
   },
   {
     q:'Snap-on 創辦人 Joseph Johnson 當年設計的口號是？',
@@ -264,7 +264,8 @@ const QUESTIONS = [
       '讓工具會思考！'
     ],
     answer:1,
-    explain:'最早的口號是「五個工具幹五十件活！（Five do the work of fifty!）」'
+    // ✅ 第二題解析文字更新（附 💡）
+    explain:'💡 解析：“Five do the work of Fifty” 是 Snap-on 的創業精神，代表創新與高效率的象徵。'
   },
   {
     q:'Snap-on 第一項專利產品是什麼？',
@@ -513,9 +514,11 @@ function render(){
  * 5) 第一題專用解析顯示
  ********************/
 function showFirstExplain(){
+  // ✅ 使用更新後的第一題解析文字（含 💡）
+  const text = QUESTIONS[0].explain;
   explainEl.innerHTML = `
     <div class="explain-card">
-      解析：Snap-on 於 1920 年在美國威斯康辛州 Kenosha 成立，開啟了百年專業工具的傳奇旅程。
+      ${text}
     </div>
   `;
 }
@@ -558,14 +561,13 @@ nextBtn.addEventListener('click', () => {
 
   // ✅ 第一題：先顯示解析，再進入第二題
   if (state.idx === 0 && !state.firstExplainShown){
-    // 沒選答案就不給按
     if (typeof state.selected[0] !== 'number'){
       alert('請先選擇一個答案喔！');
       return;
     }
     state.firstExplainShown = true;
     showFirstExplain();
-    return; // 不換題
+    return; // 不換題，先顯示解析
   }
 
   // 其他情況正常換下一題
