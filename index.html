@@ -131,12 +131,12 @@
       font-weight:700;
     }
 
-    /* 固定「下一題」與「交卷」位置：右 30vw、下 5vw */
+    /* ✅ 固定「下一題」與「交卷」位置：右 30vw、下 2vw */
     #next,
     #finish{
       position:fixed;
       right:30vw;
-      bottom:5vw;
+      bottom:2vw;
       z-index:20;
     }
 
@@ -304,7 +304,7 @@ const QUESTIONS = [
       '銀色'
     ],
     answer:1,
-    explain:'💡 解析：鮮紅色的工具車是 Snap-on 的標誌，象徵熱情、力量與專業。'
+    explain:'💡 解析：鮮紅色的工具車是 Snap-on 的標誌，象徟熱情、力量與專業。'
   },
   {
     q:'Snap-on 在美國首創的「行動工具車（Tool Truck）」有何特別之處？',
@@ -473,14 +473,40 @@ function render(){
 }
 
 /********************
- * 顯示解析
+ * 顯示解析 + 標示對錯
  ********************/
 function showExplain(idx){
-  const text = QUESTIONS[idx].explain;
+  const q = QUESTIONS[idx];
+  const text = q.explain;
   if (!text) return;
+
+  const sel = state.selected[idx];
+  let correctnessHtml = '';
+  if (typeof sel === 'number'){
+    const isCorrect   = sel === q.answer;
+    const selText     = `${'ABCD'[sel]}. ${q.options[sel]}`;
+    const correctText = `${'ABCD'[q.answer]}. ${q.options[q.answer]}`;
+
+    if (isCorrect){
+      correctnessHtml = `
+        <div style="margin-bottom:6px;">
+          ✅ 你的答案：${selText}（正確）
+        </div>
+      `;
+    } else {
+      correctnessHtml = `
+        <div style="margin-bottom:6px;">
+          ❌ 你的答案：${selText}<br>
+          正確答案：${correctText}
+        </div>
+      `;
+    }
+  }
+
   explainEl.innerHTML = `
     <div class="explain-card">
-      ${text}
+      ${correctnessHtml}
+      <div>${text}</div>
     </div>
   `;
 }
@@ -522,7 +548,7 @@ nextBtn.addEventListener('click', () => {
   const total = QUESTIONS.length;
   const idx   = state.idx;
 
-  // 任何有設定 explain 的題目：先顯示解析，再進下一題
+  // 有解析的題目：先顯示解析 + 對錯，再進下一題
   if (!state.explainShown[idx] && QUESTIONS[idx].explain){
     if (typeof state.selected[idx] !== 'number'){
       alert('請先選擇一個答案喔！');
@@ -542,7 +568,7 @@ nextBtn.addEventListener('click', () => {
 finishBtn.addEventListener('click', () => {
   const idx = state.idx;
 
-  // 第 10 題：先顯示解析，再按一次才真正交卷
+  // 第 10 題：先顯示解析 + 對錯，再按一次才真正交卷
   if (!state.explainShown[idx] && QUESTIONS[idx].explain){
     if (typeof state.selected[idx] !== 'number'){
       alert('請先選擇一個答案喔！');
