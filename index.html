@@ -53,6 +53,7 @@
       align-items:flex-end;
     }
 
+    /* ✅ 題目卡片寬度固定 28vw */
     .card{
       background:#0b1220cc;
       border:1px solid #1f2937;
@@ -60,7 +61,7 @@
       padding:18px;
       margin:14px 0;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
-      width:25vw;
+      width:28vw;
       box-sizing:border-box;
     }
 
@@ -105,13 +106,14 @@
       margin-top:8px;
       align-self:flex-end;
     }
+    /* ✅ 解析區塊也改成 28vw，跟題目對齊 */
     .explain-card{
       background:#111827cc;
       border:1px solid #1f2937;
       border-radius:12px;
       padding:12px 14px;
       font-size:14px;
-      width:25vw;
+      width:28vw;
       box-sizing:border-box;
     }
 
@@ -131,7 +133,7 @@
       font-weight:700;
     }
 
-    /* 固定「下一題」與「交卷」位置：右 30vw、下 2vw */
+    /* 下一題 / 交卷 固定在右側 30vw、下側 2vw */
     #next,
     #finish{
       position:fixed;
@@ -158,12 +160,12 @@
       border-radius:12px;
     }
 
-    /* ✅ 成績彈跳視窗（置中） */
+    /* 成績彈跳視窗（置中） */
     #resultOverlay{
       position:fixed;
       inset:0;
       background:rgba(0,0,0,.65);
-      display:none;              /* 顯示時改成 flex */
+      display:none;
       align-items:center;
       justify-content:center;
       z-index:60;
@@ -244,21 +246,17 @@
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
-    <!-- 這個 div 目前沒用到，但保留 -->
     <div id="summary"></div>
   </main>
 
   <footer></footer>
 
-  <!-- ✅ 成績彈跳視窗 -->
+  <!-- 成績彈跳視窗 -->
   <div id="resultOverlay">
     <div id="resultModal"></div>
   </div>
 
 <script>
-/********************
- * 題庫（共 10 題）
- ********************/
 const QUESTIONS = [
   {
     q:'Snap-on 成立於哪一年？',
@@ -367,16 +365,13 @@ const QUESTIONS = [
   },
 ];
 
-/********************
- * 狀態與設定
- ********************/
 let state = {
   idx: 0,
   score: 0,
-  selected: {},          // 每題選哪一個 index
+  selected: {},
   startAt: Date.now(),
   finished: false,
-  explainShown: {}       // 紀錄哪題已經顯示過解析
+  explainShown: {}
 };
 
 const POINTS_PER_Q = 1;
@@ -390,15 +385,6 @@ const summaryEl    = $('#summary');
 const overlayEl    = $('#resultOverlay');
 const resultModal  = $('#resultModal');
 
-function formatTime(sec){
-  const m = Math.floor(sec/60).toString().padStart(2,'0');
-  const s = Math.floor(sec%60).toString().padStart(2,'0');
-  return `${m}:${s}`;
-}
-
-/********************
- * 繪製題目畫面
- ********************/
 function render(){
   const total = QUESTIONS.length;
 
@@ -500,9 +486,6 @@ function render(){
   quizEl.appendChild(card);
 }
 
-/********************
- * 顯示解析 + 標示對錯
- ********************/
 function showExplain(idx){
   const q = QUESTIONS[idx];
   const text = q.explain;
@@ -539,9 +522,6 @@ function showExplain(idx){
   `;
 }
 
-/********************
- * 顯示成績（用彈跳視窗）
- ********************/
 function showResultModal(score, maxScore){
   const percent = Math.round((score / maxScore) * 100);
 
@@ -554,7 +534,6 @@ function showResultModal(score, maxScore){
 
   overlayEl.style.display = 'flex';
 
-  // ✅ 再挑戰一次：重設狀態、回到第一題
   const restartBtn = document.querySelector('#restartBtn');
   restartBtn.onclick = () => {
     overlayEl.style.display = 'none';
@@ -570,9 +549,6 @@ function showResultModal(score, maxScore){
   };
 }
 
-/********************
- * 計算成績（不顯示作答時間）
- ********************/
 function grade(){
   let score = 0;
 
@@ -587,19 +563,13 @@ function grade(){
   state.finished = true;
 
   const maxScore = QUESTIONS.length * POINTS_PER_Q;
-
-  // ✅ 用 Modal 顯示成績
   showResultModal(score, maxScore);
 }
 
-/********************
- * 事件與初始化
- ********************/
 nextBtn.addEventListener('click', () => {
   const total = QUESTIONS.length;
   const idx   = state.idx;
 
-  // 有解析的題目：先顯示解析 + 對錯，再進下一題
   if (!state.explainShown[idx] && QUESTIONS[idx].explain){
     if (typeof state.selected[idx] !== 'number'){
       alert('請先選擇一個答案喔！');
@@ -619,7 +589,6 @@ nextBtn.addEventListener('click', () => {
 finishBtn.addEventListener('click', () => {
   const idx = state.idx;
 
-  // 第 10 題：先顯示解析 + 對錯，再按一次才真正交卷
   if (!state.explainShown[idx] && QUESTIONS[idx].explain){
     if (typeof state.selected[idx] !== 'number'){
       alert('請先選擇一個答案喔！');
@@ -633,7 +602,6 @@ finishBtn.addEventListener('click', () => {
   grade();
 });
 
-// 初次畫面
 render();
 </script>
 </body>
