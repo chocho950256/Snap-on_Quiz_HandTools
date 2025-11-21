@@ -131,24 +131,13 @@
       font-weight:700;
     }
 
-    /* ✅ 固定「下一題」與「交卷」位置：右 30vw、下 2vw */
+    /* 固定「下一題」與「交卷」位置：右 30vw、下 2vw */
     #next,
     #finish{
       position:fixed;
       right:30vw;
       bottom:2vw;
       z-index:20;
-    }
-
-    .result{
-      padding:16px;
-      border-radius:12px;
-      background:#052e16;
-      border:1px solid #14532d;
-      color:#bbf7d0;
-      width:90%;
-      margin-top:16px;
-      box-sizing:border-box;
     }
 
     footer{
@@ -167,6 +156,35 @@
       z-index:10;
       pointer-events:none;
       border-radius:12px;
+    }
+
+    /* ✅ 成績彈跳視窗（置中） */
+    #resultOverlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.65);
+      display:none;              /* 顯示時改成 flex */
+      align-items:center;
+      justify-content:center;
+      z-index:60;
+    }
+    #resultModal{
+      background:#020617f0;
+      border-radius:18px;
+      padding:24px 28px;
+      max-width:320px;
+      width:80%;
+      text-align:center;
+      border:1px solid #e5e7eb33;
+      box-shadow:0 20px 40px rgba(0,0,0,.6);
+    }
+    #resultModal h2{
+      margin:0 0 10px;
+      font-size:20px;
+    }
+    #resultModal p{
+      margin:4px 0;
+      font-size:16px;
     }
 
     @media (max-width: 640px){
@@ -188,8 +206,7 @@
       main{
         align-items:stretch;
       }
-      .card,
-      .result{
+      .card{
         width:100%;
       }
       .explain-card{
@@ -203,6 +220,9 @@
       }
       .controls{
         height:auto;
+      }
+      #resultModal{
+        width:92%;
       }
     }
   </style>
@@ -224,10 +244,16 @@
       <button id="finish" class="btn" style="display:none">交卷</button>
     </div>
 
+    <!-- 這個 div 目前沒用到，但保留 -->
     <div id="summary"></div>
   </main>
 
   <footer></footer>
+
+  <!-- ✅ 成績彈跳視窗 -->
+  <div id="resultOverlay">
+    <div id="resultModal"></div>
+  </div>
 
 <script>
 /********************
@@ -304,7 +330,7 @@ const QUESTIONS = [
       '銀色'
     ],
     answer:1,
-    explain:'💡 解析：鮮紅色的工具車是 Snap-on 的標誌，象徟熱情、力量與專業。'
+    explain:'💡 解析：鮮紅色的工具車是 Snap-on 的標誌，象徵熱情、力量與專業。'
   },
   {
     q:'Snap-on 在美國首創的「行動工具車（Tool Truck）」有何特別之處？',
@@ -356,11 +382,13 @@ let state = {
 const POINTS_PER_Q = 1;
 
 const $  = (s)=>document.querySelector(s);
-const quizEl     = $('#quiz');
-const explainEl  = $('#explain');
-const nextBtn    = $('#next');
-const finishBtn  = $('#finish');
-const summaryEl  = $('#summary');
+const quizEl       = $('#quiz');
+const explainEl    = $('#explain');
+const nextBtn      = $('#next');
+const finishBtn    = $('#finish');
+const summaryEl    = $('#summary');
+const overlayEl    = $('#resultOverlay');
+const resultModal  = $('#resultModal');
 
 function formatTime(sec){
   const m = Math.floor(sec/60).toString().padStart(2,'0');
@@ -512,7 +540,38 @@ function showExplain(idx){
 }
 
 /********************
- * 計算成績
+ * 顯示成績（用彈跳視窗）
+ ********************/
+function showResultModal(score, maxScore){
+  const percent = Math.round((score / maxScore) * 100);
+
+  resultModal.innerHTML = `
+    <h2>作答結果</h2>
+    <p>得分：<strong>${score} / ${maxScore}</strong></p>
+    <p>正確率：<strong>${percent}%</strong></p>
+    <button id="restartBtn" class="btn" style="margin-top:16px;">再挑戰一次！</button>
+  `;
+
+  overlayEl.style.display = 'flex';
+
+  // ✅ 再挑戰一次：重設狀態、回到第一題
+  const restartBtn = document.querySelector('#restartBtn');
+  restartBtn.onclick = () => {
+    overlayEl.style.display = 'none';
+    state.idx = 0;
+    state.score = 0;
+    state.selected = {};
+    state.startAt = Date.now();
+    state.finished = false;
+    state.explainShown = {};
+    explainEl.innerHTML = '';
+    summaryEl.innerHTML = '';
+    render();
+  };
+}
+
+/********************
+ * 計算成績（不顯示作答時間）
  ********************/
 function grade(){
   let score = 0;
@@ -528,17 +587,9 @@ function grade(){
   state.finished = true;
 
   const maxScore = QUESTIONS.length * POINTS_PER_Q;
-  const percent  = Math.round((score / maxScore) * 100);
-  const used     = Math.round((Date.now() - state.startAt) / 1000);
 
-  summaryEl.innerHTML = `
-    <div class="result">
-      <strong>成績</strong>：${score} / ${maxScore}（${percent}%）<br>
-      <strong>作答時間</strong>：${formatTime(used)}
-    </div>
-  `;
-
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  // ✅ 用 Modal 顯示成績
+  showResultModal(score, maxScore);
 }
 
 /********************
@@ -582,6 +633,7 @@ finishBtn.addEventListener('click', () => {
   grade();
 });
 
+// 初次畫面
 render();
 </script>
 </body>
